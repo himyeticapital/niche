@@ -15,7 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import hikingImage1 from "@assets/stock_images/people_hiking_mounta_1850f7b0.jpg";
-import hikingImage2 from "@assets/stock_images/people_hiking_mounta_d422e8db.jpg";
+import hikingImage2 from "@assets/stock_images/group_of_friends_hik_bf1e86b7.jpg";
 import hikingImage3 from "@assets/stock_images/people_hiking_mounta_d54ead85.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -194,13 +194,13 @@ export default function LandingPage() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
               <img 
                 src={hikingImage2} 
-                alt="Group hiking in mountains" 
+                alt="Friends hiking together" 
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4 text-white">
                 <p className="font-semibold">Weekend Adventures</p>
-                <p className="text-sm text-white/80">Hanuman Tok Trail</p>
+                <p className="text-sm text-white/80">With New Friends</p>
               </div>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
