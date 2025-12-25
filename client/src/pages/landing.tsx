@@ -46,7 +46,7 @@ export default function LandingPage() {
       role: "Hiking Group Organizer",
       avatar: "TN",
       quote:
-        "Niche helped me turn my passion into a sustainable community. I now earn enough to cover my trekking gear and more!",
+        "Jum helped me turn my passion into a sustainable community. I now earn enough to cover my trekking gear and more!",
       rating: 5,
     },
     {
