@@ -42,7 +42,7 @@ export default function LandingPage() {
       role: "Running Club Organizer",
       avatar: "SM",
       quote:
-        "EventHub helped me turn my passion into a sustainable community. I now earn enough to cover my running shoes and more!",
+        "Niche helped me turn my passion into a sustainable community. I now earn enough to cover my running shoes and more!",
       rating: 5,
     },
     {
@@ -454,7 +454,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Join thousands of people who have found their tribe through
-            EventHub. Your community is waiting.
+            Niche. Your community is waiting.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/events">
