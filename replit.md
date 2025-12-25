@@ -7,6 +7,12 @@ Niche is a hyperlocal social marketplace that combats urban loneliness by enabli
 **Expansion Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
 
 ## Recent Changes
+- **Dec 25, 2025**: Stripe payment integration
+  - Added Stripe checkout for paid event registrations
+  - Payment dialog with user details form
+  - Automatic attendee registration after successful payment
+  - Free events can be joined directly without payment
+  - Scenic hiking gallery with community-oriented images
 - **Dec 25, 2025**: Bug fixes and improvements
   - Fixed TanStack Query key format in landing page (was causing 404 errors)
   - Added validation for join and review API endpoints
@@ -65,12 +71,15 @@ shared/
 - `POST /api/events` - Create new event
 - `PATCH /api/events/:id` - Update event
 - `DELETE /api/events/:id` - Delete event
-- `POST /api/events/:id/join` - Join an event
+- `POST /api/events/:id/join` - Join an event (free events)
+- `POST /api/events/:id/checkout` - Create Stripe checkout session (paid events)
+- `POST /api/events/:id/verify-payment` - Verify payment and register attendee
 - `GET /api/events/:id/attendees` - Get event attendees
 - `GET /api/events/:id/reviews` - Get event reviews
 - `POST /api/events/:id/reviews` - Add review
 - `GET /api/organizer/dashboard` - Get dashboard stats
 - `GET /api/categories` - List all categories
+- `GET /api/stripe/config` - Get Stripe publishable key
 
 ## Design System
 - **Fonts**: Inter (body), Space Grotesk (headings)

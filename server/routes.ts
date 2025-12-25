@@ -289,28 +289,51 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Payment not completed" });
       }
 
+      // Security: Verify that the session was created for this specific event
+      if (session.metadata?.eventId !== req.params.id) {
+        return res.status(403).json({ error: "Payment session does not match this event" });
+      }
+
       const event = await storage.getEvent(req.params.id);
       if (!event) {
         return res.status(404).json({ error: "Event not found" });
       }
 
-      // Check if already registered (prevent duplicate registrations)
+      // Get email from customer_email or customer_details
+      const userEmail = session.customer_email || session.customer_details?.email;
+      const userName = session.metadata?.userName;
+      
+      if (!userName) {
+        return res.status(400).json({ error: "Missing attendee name" });
+      }
+
+      if (!userEmail) {
+        return res.status(400).json({ error: "Missing attendee email" });
+      }
+
+      // Check if already registered by email (prevents duplicate registrations)
       const existingAttendees = await storage.getEventAttendees(req.params.id);
       const alreadyRegistered = existingAttendees.some(
-        a => a.userId === session.customer_email || a.userName === session.metadata?.userName
+        a => a.userId === userEmail
       );
 
       if (alreadyRegistered) {
         return res.json({ success: true, message: "Already registered" });
       }
 
-      // Register attendee
+      // Check capacity
+      if (event.currentAttendees! >= event.maxCapacity) {
+        return res.status(400).json({ error: "Event is now full" });
+      }
+
+      // Register attendee - use email as stable userId for consistency with leave endpoint
+      // Store sessionId in paymentStatus to track which Stripe session was used
       const attendeeData = {
         eventId: req.params.id,
-        userId: session.customer_email || `user-${Date.now()}`,
-        userName: session.metadata?.userName || 'Anonymous',
+        userId: userEmail,
+        userName: userName,
         userPhone: session.metadata?.userPhone || '',
-        paymentStatus: 'completed',
+        paymentStatus: `paid:${sessionId}`, // Include sessionId for audit trail
         joinedAt: new Date().toISOString(),
       };
 
