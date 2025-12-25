@@ -39,7 +39,7 @@ export function Header() {
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
               <MapPin className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-bold">Jum</span>
+            <span className="font-display text-xl font-bold">Garum</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

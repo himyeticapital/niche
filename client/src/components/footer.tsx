@@ -36,7 +36,7 @@ export function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
                 <MapPin className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl font-bold">Jum</span>
+              <span className="font-display text-xl font-bold">Garum</span>
             </Link>
             <p className="text-muted-foreground mb-4 max-w-sm">
               Combat urban loneliness through hyperlocal niche events. Find your

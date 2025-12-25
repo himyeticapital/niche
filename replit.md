@@ -1,7 +1,7 @@
-# Jum - Hyperlocal Social Event Marketplace
+# Garum - Hyperlocal Social Event Marketplace
 
 ## Overview
-Jum is a hyperlocal social marketplace that combats urban loneliness by enabling real-world discovery of niche interest groups within a 5km radius. Unlike generic event platforms, Jum focuses on authentic community building through passion-based hyperlocal events.
+Garum is a hyperlocal social marketplace that combats urban loneliness by enabling real-world discovery of niche interest groups within a 5km radius. Unlike generic event platforms, Garum focuses on authentic community building through passion-based hyperlocal events.
 
 **MVP Trial Location**: Gangtok, Sikkim
 **Expansion Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
