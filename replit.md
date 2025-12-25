@@ -3,7 +3,8 @@
 ## Overview
 Niche is a hyperlocal social marketplace that combats urban loneliness by enabling real-world discovery of niche interest groups within a 5km radius. Unlike generic event platforms, Niche focuses on authentic community building through passion-based hyperlocal events.
 
-**Primary Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
+**MVP Trial Location**: Gangtok, Sikkim
+**Expansion Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
 
 ## Recent Changes
 - **Dec 25, 2025**: Bug fixes and improvements

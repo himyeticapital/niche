@@ -148,9 +148,9 @@ export default function LandingPage() {
         <AnimatedStatsContainer>
           <div className="mx-auto max-w-7xl px-4 py-8">
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-              <AnimatedStat value={10000} suffix="+" label="Events Hosted" />
+              <AnimatedStat value={5} suffix="+" label="Events Hosted" />
               <div className="h-8 w-px bg-border hidden md:block" />
-              <AnimatedStat value={50} suffix="+" label="Cities" />
+              <AnimatedStat value={1} suffix="+" label="Cities" />
               <div className="h-8 w-px bg-border hidden md:block" />
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2">
