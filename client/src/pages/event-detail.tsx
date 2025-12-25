@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useSearch } from "wouter";
 import {
   MapPin,
   Calendar,
@@ -12,6 +13,9 @@ import {
   ChevronLeft,
   MessageCircle,
   UserPlus,
+  CreditCard,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,11 +28,30 @@ import { TrustBadge, VerifiedBadge } from "@/components/trust-badge";
 import { getCategoryIcon } from "@/components/category-pill";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { Event, Review } from "@shared/schema";
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const searchString = useSearch();
+  const searchParams = new URLSearchParams(searchString);
+
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    userName: "",
+    userEmail: "",
+    userPhone: "",
+  });
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const { data: event, isLoading } = useQuery<Event>({
     queryKey: ["/api/events", id],
@@ -39,20 +62,82 @@ export default function EventDetailPage() {
     enabled: !!id,
   });
 
+  // Handle payment success/cancel from URL params
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const sessionId = searchParams.get("session_id");
+
+    if (payment === "success" && sessionId) {
+      setIsVerifying(true);
+      // Verify payment and register attendee
+      apiRequest("POST", `/api/events/${id}/verify-payment`, { sessionId })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
+            toast({
+              title: "Payment successful!",
+              description: "You've been registered for this event. See you there!",
+            });
+          }
+        })
+        .catch(() => {
+          toast({
+            title: "Verification issue",
+            description: "Your payment went through but we had trouble verifying. Please contact support.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => {
+          setIsVerifying(false);
+          // Clear URL params
+          window.history.replaceState({}, "", `/events/${id}`);
+        });
+    } else if (payment === "cancelled") {
+      toast({
+        title: "Payment cancelled",
+        description: "No worries! You can try again when you're ready.",
+      });
+      window.history.replaceState({}, "", `/events/${id}`);
+    }
+  }, [searchString, id, toast]);
+
+  const checkoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", `/api/events/${id}/checkout`, paymentForm);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Failed to start checkout",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // For free events, direct join
   const joinMutation = useMutation({
     mutationFn: async () => {
       return apiRequest("POST", `/api/events/${id}/join`, {
-        userName: "Demo User",
-        userPhone: "+91 98765 43210",
+        userName: paymentForm.userName || "Guest",
+        userPhone: paymentForm.userPhone,
         paymentStatus: "completed",
         joinedAt: new Date().toISOString(),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
+      setShowPaymentDialog(false);
       toast({
         title: "Successfully joined!",
-        description: "You've been added to the event. Check your email for confirmation.",
+        description: "You've been added to the event. See you there!",
       });
     },
     onError: () => {
@@ -63,6 +148,41 @@ export default function EventDetailPage() {
       });
     },
   });
+
+  const handleJoinClick = () => {
+    if (event?.price === 0) {
+      // For free events, show simple dialog then direct join
+      setShowPaymentDialog(true);
+    } else {
+      // For paid events, show payment dialog
+      setShowPaymentDialog(true);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!paymentForm.userName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter your name to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (event?.price === 0) {
+      joinMutation.mutate();
+    } else {
+      if (!paymentForm.userEmail.trim()) {
+        toast({
+          title: "Email required",
+          description: "Please enter your email for payment confirmation.",
+          variant: "destructive",
+        });
+        return;
+      }
+      checkoutMutation.mutate();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -415,18 +535,26 @@ export default function EventDetailPage() {
                   <Button
                     className="w-full"
                     size="lg"
-                    disabled={isFull || joinMutation.isPending}
-                    onClick={() => joinMutation.mutate()}
+                    disabled={isFull || isVerifying}
+                    onClick={handleJoinClick}
                     data-testid="button-join-event"
                   >
-                    {joinMutation.isPending ? (
-                      "Joining..."
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Verifying payment...
+                      </>
                     ) : isFull ? (
                       "Event Full"
-                    ) : (
+                    ) : event.price === 0 ? (
                       <>
                         <UserPlus className="h-4 w-4 mr-2" />
-                        Join Event
+                        Join Free Event
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Book Now
                       </>
                     )}
                   </Button>
@@ -446,6 +574,122 @@ export default function EventDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Payment/Registration Dialog */}
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {event?.price === 0 ? (
+                <>
+                  <CheckCircle className="h-5 w-5 text-emerald-500" />
+                  Join Free Event
+                </>
+              ) : (
+                <>
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  Complete Your Booking
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {event?.price === 0
+                ? "Enter your details to reserve your spot."
+                : `Pay ${event?.price} to secure your spot at ${event?.title}.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="userName">Full Name *</Label>
+              <Input
+                id="userName"
+                placeholder="Enter your name"
+                value={paymentForm.userName}
+                onChange={(e) =>
+                  setPaymentForm((prev) => ({ ...prev, userName: e.target.value }))
+                }
+                data-testid="input-user-name"
+              />
+            </div>
+
+            {event?.price !== 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="userEmail">Email *</Label>
+                <Input
+                  id="userEmail"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={paymentForm.userEmail}
+                  onChange={(e) =>
+                    setPaymentForm((prev) => ({ ...prev, userEmail: e.target.value }))
+                  }
+                  data-testid="input-user-email"
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="userPhone">Phone (optional)</Label>
+              <Input
+                id="userPhone"
+                type="tel"
+                placeholder="+91 98765 43210"
+                value={paymentForm.userPhone}
+                onChange={(e) =>
+                  setPaymentForm((prev) => ({ ...prev, userPhone: e.target.value }))
+                }
+                data-testid="input-user-phone"
+              />
+            </div>
+
+            {event?.price !== 0 && (
+              <div className="rounded-md bg-muted p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Event Fee</span>
+                  <span className="flex items-center font-semibold">
+                    <IndianRupee className="h-4 w-4" />
+                    {event?.price}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  You'll be redirected to our secure payment page.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowPaymentDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={handleSubmit}
+              disabled={checkoutMutation.isPending || joinMutation.isPending}
+              data-testid="button-submit-booking"
+            >
+              {checkoutMutation.isPending || joinMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : event?.price === 0 ? (
+                "Confirm Registration"
+              ) : (
+                <>
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Proceed to Payment
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
