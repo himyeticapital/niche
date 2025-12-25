@@ -31,27 +31,27 @@ export default function LandingPage() {
 
   const testimonials = [
     {
-      name: "Priya Sharma",
+      name: "Pema Diki",
       role: "Dog Parent",
-      avatar: "PS",
+      avatar: "PD",
       quote:
-        "I found my tribe! Every Sunday morning, I now hike with 10 other dog parents from my neighborhood. My dog has made friends, and so have I.",
+        "I found my tribe! Every Sunday morning, I now hike with 10 other dog parents at Hanuman Tok. My dog has made friends, and so have I.",
       rating: 5,
     },
     {
-      name: "Sahil Mehta",
-      role: "Running Club Organizer",
-      avatar: "SM",
+      name: "Tenzin Norbu",
+      role: "Hiking Group Organizer",
+      avatar: "TN",
       quote:
-        "Niche helped me turn my passion into a sustainable community. I now earn enough to cover my running shoes and more!",
+        "Niche helped me turn my passion into a sustainable community. I now earn enough to cover my trekking gear and more!",
       rating: 5,
     },
     {
-      name: "Rahul Verma",
-      role: "Board Game Enthusiast",
-      avatar: "RV",
+      name: "Karma Yangzom",
+      role: "Art Workshop Enthusiast",
+      avatar: "KY",
       quote:
-        "As an introvert new to Bangalore, joining a 6-person board game night was perfect. Made 3 close friends in my first month.",
+        "As someone new to Gangtok, joining a small Thangka painting workshop was perfect. Made 3 close friends in my first month.",
       rating: 5,
     },
   ];

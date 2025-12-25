@@ -72,7 +72,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6065,
         maxCapacity: 15,
         currentAttendees: 12,
-        price: 150,
+        price: 1000,
         isRecurring: true,
         recurringType: "weekly",
         bringFriend: true,
@@ -105,7 +105,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6150,
         maxCapacity: 12,
         currentAttendees: 8,
-        price: 100,
+        price: 1000,
         isRecurring: false,
         recurringType: "",
         bringFriend: true,
@@ -138,7 +138,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6138,
         maxCapacity: 30,
         currentAttendees: 24,
-        price: 500,
+        price: 1000,
         isRecurring: false,
         recurringType: "",
         bringFriend: true,
@@ -171,7 +171,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6000,
         maxCapacity: 10,
         currentAttendees: 7,
-        price: 800,
+        price: 1000,
         isRecurring: false,
         recurringType: "",
         bringFriend: true,
@@ -204,7 +204,7 @@ export class MemStorage implements IStorage {
         longitude: 88.7644,
         maxCapacity: 8,
         currentAttendees: 5,
-        price: 600,
+        price: 1200,
         isRecurring: true,
         recurringType: "weekly",
         bringFriend: true,
@@ -237,7 +237,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6145,
         maxCapacity: 50,
         currentAttendees: 38,
-        price: 400,
+        price: 1000,
         isRecurring: true,
         recurringType: "weekly",
         bringFriend: true,
@@ -303,7 +303,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6135,
         maxCapacity: 20,
         currentAttendees: 14,
-        price: 0,
+        price: 1000,
         isRecurring: true,
         recurringType: "monthly",
         bringFriend: true,
@@ -336,7 +336,7 @@ export class MemStorage implements IStorage {
         longitude: 88.6050,
         maxCapacity: 40,
         currentAttendees: 28,
-        price: 200,
+        price: 1000,
         isRecurring: false,
         recurringType: "",
         bringFriend: true,
@@ -648,7 +648,7 @@ export class MemStorage implements IStorage {
     );
 
     const totalRevenue = myEvents.reduce((sum, e) => {
-      return sum + (e.currentAttendees || 0) * (e.price || 0) * 0.9;
+      return sum + (e.currentAttendees || 0) * (e.price || 0) * 0.8;
     }, 0);
 
     const totalAttendees = myEvents.reduce(
@@ -676,7 +676,7 @@ export class MemStorage implements IStorage {
 
     const revenueByEvent = myEvents.map((e) => ({
       eventTitle: e.title,
-      revenue: (e.currentAttendees || 0) * (e.price || 0) * 0.9,
+      revenue: (e.currentAttendees || 0) * (e.price || 0) * 0.8,
     }));
 
     return {
