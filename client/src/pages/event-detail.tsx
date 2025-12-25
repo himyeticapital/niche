@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import {
@@ -13,7 +13,6 @@ import {
   ChevronLeft,
   MessageCircle,
   UserPlus,
-  CreditCard,
   CheckCircle,
   Loader2,
 } from "lucide-react";
@@ -39,11 +38,6 @@ import {
 } from "@/components/ui/dialog";
 import type { Event, Review } from "@shared/schema";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,11 +46,8 @@ export default function EventDetailPage() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     userName: "",
-    userEmail: "",
     userPhone: "",
   });
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   const { data: event, isLoading } = useQuery<Event>({
     queryKey: ["/api/events", id],
@@ -67,30 +58,7 @@ export default function EventDetailPage() {
     enabled: !!id,
   });
 
-  // Load Razorpay script
-  useEffect(() => {
-    if (window.Razorpay) {
-      setRazorpayLoaded(true);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => setRazorpayLoaded(true);
-    script.onerror = () => {
-      console.error("Failed to load Razorpay script");
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
-
-  // For free events, direct join
+  // Direct join for all events (payments disabled)
   const joinMutation = useMutation({
     mutationFn: async () => {
       return apiRequest("POST", `/api/events/${id}/join`, {
@@ -103,7 +71,7 @@ export default function EventDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
       setShowPaymentDialog(false);
-      setPaymentForm({ userName: "", userEmail: "", userPhone: "" });
+      setPaymentForm({ userName: "", userPhone: "" });
       toast({
         title: "Successfully joined!",
         description: "You've been added to the event. See you there!",
@@ -117,103 +85,6 @@ export default function EventDetailPage() {
       });
     },
   });
-
-  const handleRazorpayPayment = useCallback(async () => {
-    if (!razorpayLoaded) {
-      toast({
-        title: "Payment not ready",
-        description: "Please wait a moment and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      // Create order on backend
-      const response = await apiRequest("POST", `/api/events/${id}/create-order`, paymentForm);
-      const orderData = await response.json();
-
-      if (orderData.error) {
-        throw new Error(orderData.error);
-      }
-
-      // Open Razorpay checkout
-      const options = {
-        key: orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: "Niche",
-        description: orderData.eventTitle,
-        order_id: orderData.orderId,
-        prefill: orderData.prefill,
-        theme: {
-          color: "#7c3aed", // Purple primary color
-        },
-        handler: async function (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) {
-          // Verify payment on backend
-          try {
-            const verifyResponse = await apiRequest("POST", `/api/events/${id}/verify-payment`, {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              userName: paymentForm.userName,
-              userEmail: paymentForm.userEmail,
-              userPhone: paymentForm.userPhone,
-            });
-            const result = await verifyResponse.json();
-
-            if (result.success) {
-              queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
-              setShowPaymentDialog(false);
-              setPaymentForm({ userName: "", userEmail: "", userPhone: "" });
-              toast({
-                title: "Payment successful!",
-                description: "You've been registered for this event. See you there!",
-              });
-            } else {
-              throw new Error(result.error || "Verification failed");
-            }
-          } catch (error) {
-            toast({
-              title: "Verification issue",
-              description: "Payment received but verification failed. Please contact support.",
-              variant: "destructive",
-            });
-          }
-          setIsProcessing(false);
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", function (response: any) {
-        toast({
-          title: "Payment failed",
-          description: response.error?.description || "Please try again.",
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-      });
-      razorpay.open();
-    } catch (error: any) {
-      toast({
-        title: "Failed to start payment",
-        description: error.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  }, [id, paymentForm, razorpayLoaded, toast]);
 
   const handleJoinClick = () => {
     setShowPaymentDialog(true);
@@ -229,19 +100,8 @@ export default function EventDetailPage() {
       return;
     }
 
-    if (event?.price === 0) {
-      joinMutation.mutate();
-    } else {
-      if (!paymentForm.userEmail.trim()) {
-        toast({
-          title: "Email required",
-          description: "Please enter your email for payment confirmation.",
-          variant: "destructive",
-        });
-        return;
-      }
-      handleRazorpayPayment();
-    }
+    // Payment disabled for now - all events are free to join
+    joinMutation.mutate();
   };
 
   if (isLoading) {
@@ -595,26 +455,16 @@ export default function EventDetailPage() {
                   <Button
                     className="w-full"
                     size="lg"
-                    disabled={isFull || isProcessing}
+                    disabled={isFull}
                     onClick={handleJoinClick}
                     data-testid="button-join-event"
                   >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Processing...
-                      </>
-                    ) : isFull ? (
+                    {isFull ? (
                       "Event Full"
-                    ) : event.price === 0 ? (
-                      <>
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Join Free Event
-                      </>
                     ) : (
                       <>
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Book Now
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Join Event
                       </>
                     )}
                   </Button>
@@ -635,27 +485,16 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {/* Payment/Registration Dialog */}
+      {/* Registration Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {event?.price === 0 ? (
-                <>
-                  <CheckCircle className="h-5 w-5 text-emerald-500" />
-                  Join Free Event
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-5 w-5 text-primary" />
-                  Complete Your Booking
-                </>
-              )}
+              <CheckCircle className="h-5 w-5 text-emerald-500" />
+              Join This Event
             </DialogTitle>
             <DialogDescription>
-              {event?.price === 0
-                ? "Enter your details to reserve your spot."
-                : `Pay ${event?.price} to secure your spot at ${event?.title}.`}
+              Enter your details to reserve your spot at {event?.title}.
             </DialogDescription>
           </DialogHeader>
 
@@ -673,22 +512,6 @@ export default function EventDetailPage() {
               />
             </div>
 
-            {event?.price !== 0 && (
-              <div className="space-y-2">
-                <Label htmlFor="userEmail">Email *</Label>
-                <Input
-                  id="userEmail"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={paymentForm.userEmail}
-                  onChange={(e) =>
-                    setPaymentForm((prev) => ({ ...prev, userEmail: e.target.value }))
-                  }
-                  data-testid="input-user-email"
-                />
-              </div>
-            )}
-
             <div className="space-y-2">
               <Label htmlFor="userPhone">Phone (optional)</Label>
               <Input
@@ -702,21 +525,6 @@ export default function EventDetailPage() {
                 data-testid="input-user-phone"
               />
             </div>
-
-            {event?.price !== 0 && (
-              <div className="rounded-md bg-muted p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Event Fee</span>
-                  <span className="flex items-center font-semibold">
-                    <IndianRupee className="h-4 w-4" />
-                    {event?.price}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Secure payment powered by Razorpay
-                </p>
-              </div>
-            )}
           </div>
 
           <div className="flex gap-3">
@@ -730,21 +538,16 @@ export default function EventDetailPage() {
             <Button
               className="flex-1"
               onClick={handleSubmit}
-              disabled={isProcessing || joinMutation.isPending}
+              disabled={joinMutation.isPending}
               data-testid="button-submit-booking"
             >
-              {isProcessing || joinMutation.isPending ? (
+              {joinMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Processing...
                 </>
-              ) : event?.price === 0 ? (
-                "Confirm Registration"
               ) : (
-                <>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Proceed to Payment
-                </>
+                "Confirm Registration"
               )}
             </Button>
           </div>
