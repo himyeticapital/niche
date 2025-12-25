@@ -59,7 +59,7 @@ export default function LandingPage() {
     {
       icon: Search,
       title: "Discover",
-      description: "Find niche events within 5km based on your interests",
+      description: "Find niche events near you based on your interests",
     },
     {
       icon: UserPlus,
@@ -112,7 +112,7 @@ export default function LandingPage() {
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Find Your Community
             <br />
-            <span className="text-primary">Within 5km</span>
+            <span className="text-primary">Near You</span>
           </h1>
 
           <p className="mx-auto max-w-2xl text-lg md:text-xl text-muted-foreground mb-8">

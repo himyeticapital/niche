@@ -40,7 +40,7 @@ export function Footer() {
             </Link>
             <p className="text-muted-foreground mb-4 max-w-sm">
               Combat urban loneliness through hyperlocal niche events. Find your
-              community within 5km and build genuine connections.
+              community near you and build genuine connections.
             </p>
 
             <div className="space-y-3">
