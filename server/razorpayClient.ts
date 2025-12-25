@@ -67,3 +67,13 @@ export async function createOrder(params: CreateOrderParams) {
 
   return order;
 }
+
+export async function fetchOrder(orderId: string) {
+  const razorpay = getRazorpayClient();
+  return razorpay.orders.fetch(orderId);
+}
+
+export async function fetchPayment(paymentId: string) {
+  const razorpay = getRazorpayClient();
+  return razorpay.payments.fetch(paymentId);
+}

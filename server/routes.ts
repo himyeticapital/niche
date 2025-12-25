@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertEventSchema, insertAttendeeSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
-import { getRazorpayKeyId, createOrder, verifyPaymentSignature } from "./razorpayClient";
+import { getRazorpayKeyId, createOrder, verifyPaymentSignature, fetchOrder, fetchPayment } from "./razorpayClient";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -277,7 +277,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Payment verification data required" });
       }
 
-      // Verify the payment signature
+      // Verify the payment signature (HMAC)
       const isValid = verifyPaymentSignature(
         razorpay_order_id,
         razorpay_payment_id,
@@ -288,23 +288,56 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Invalid payment signature" });
       }
 
+      // Fetch order from Razorpay to verify it belongs to this event
+      const order = await fetchOrder(razorpay_order_id);
+      const orderNotes = order.notes as Record<string, string> | undefined;
+      
+      if (!orderNotes || orderNotes.eventId !== req.params.id) {
+        return res.status(403).json({ error: "Payment order does not match this event" });
+      }
+
+      // Verify payment status
+      const payment = await fetchPayment(razorpay_payment_id);
+      if (payment.status !== 'captured') {
+        return res.status(400).json({ error: "Payment not captured" });
+      }
+
       const event = await storage.getEvent(req.params.id);
       if (!event) {
         return res.status(404).json({ error: "Event not found" });
       }
 
-      if (!userName || !userEmail) {
+      // Verify payment amount matches event price (in paise)
+      const expectedAmount = (event.price ?? 0) * 100;
+      if (payment.amount !== expectedAmount) {
+        return res.status(400).json({ error: "Payment amount mismatch" });
+      }
+
+      // Get user details from order notes (server-side truth)
+      const serverUserName = orderNotes.userName || userName;
+      const serverUserEmail = orderNotes.userEmail || userEmail;
+
+      if (!serverUserName || !serverUserEmail) {
         return res.status(400).json({ error: "User details required" });
       }
 
-      // Check if already registered by email
+      // Check if already registered by payment ID (prevents replay)
       const existingAttendees = await storage.getEventAttendees(req.params.id);
-      const alreadyRegistered = existingAttendees.some(
-        a => a.userId === userEmail
+      const alreadyRegisteredByPayment = existingAttendees.some(
+        a => a.paymentStatus?.includes(razorpay_payment_id)
       );
 
-      if (alreadyRegistered) {
+      if (alreadyRegisteredByPayment) {
         return res.json({ success: true, message: "Already registered" });
+      }
+
+      // Also check by email
+      const alreadyRegisteredByEmail = existingAttendees.some(
+        a => a.userId === serverUserEmail
+      );
+
+      if (alreadyRegisteredByEmail) {
+        return res.json({ success: true, message: "Already registered with this email" });
       }
 
       // Check capacity
@@ -312,13 +345,13 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Event is now full" });
       }
 
-      // Register attendee
+      // Register attendee using server-side verified data
       const attendeeData = {
         eventId: req.params.id,
-        userId: userEmail,
-        userName: userName,
-        userPhone: userPhone || '',
-        paymentStatus: `paid:${razorpay_payment_id}`,
+        userId: serverUserEmail,
+        userName: serverUserName,
+        userPhone: orderNotes.userPhone || userPhone || '',
+        paymentStatus: `paid:${razorpay_payment_id}:${razorpay_order_id}`,
         joinedAt: new Date().toISOString(),
       };
 
