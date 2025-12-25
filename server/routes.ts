@@ -3,11 +3,15 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEventSchema, insertAttendeeSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
+import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Setup authentication first
+  await setupAuth(app);
+  registerAuthRoutes(app);
   
   // Get all events with optional filters
   app.get("/api/events", async (req, res) => {

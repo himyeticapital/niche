@@ -157,3 +157,6 @@ export interface EventFilters {
   date?: string;
   searchQuery?: string;
 }
+
+// Export auth models
+export * from "./models/auth";

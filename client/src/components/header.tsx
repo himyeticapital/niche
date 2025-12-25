@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { MapPin, Plus, Menu, X, Bell, User } from "lucide-react";
+import { MapPin, Plus, Menu, X, Bell, User, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,17 +11,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Header() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { href: "/", label: "Discover" },
     { href: "/events", label: "Events" },
     { href: "/dashboard", label: "Dashboard" },
   ];
+
+  const getInitials = () => {
+    if (!user) return "U";
+    const first = user.firstName?.[0] || "";
+    const last = user.lastName?.[0] || "";
+    return (first + last) || user.email?.[0]?.toUpperCase() || "U";
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -48,55 +57,86 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/create" className="hidden sm:block">
-              <Button data-testid="button-create-event">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Event
-              </Button>
-            </Link>
+            {isAuthenticated && (
+              <Link href="/create" className="hidden sm:block">
+                <Button data-testid="button-create-event">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Event
+                </Button>
+              </Link>
+            )}
 
-            <Button
-              size="icon"
-              variant="ghost"
-              className="relative"
-              data-testid="button-notifications"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                3
-              </span>
-            </Button>
+            {isAuthenticated && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="relative"
+                data-testid="button-notifications"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                  3
+                </span>
+              </Button>
+            )}
 
             <ThemeToggle />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  data-testid="button-user-menu"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                      SM
-                    </AvatarFallback>
-                  </Avatar>
+            {isLoading ? (
+              <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+            ) : isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    data-testid="button-user-menu"
+                  >
+                    <Avatar className="h-8 w-8">
+                      {user?.profileImageUrl && (
+                        <AvatarImage src={user.profileImageUrl} alt={user.firstName || "User"} />
+                      )}
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user?.firstName} {user?.lastName}
+                  </div>
+                  <div className="px-2 pb-1.5 text-xs text-muted-foreground">
+                    {user?.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem data-testid="menu-item-profile">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <Link href="/dashboard">
+                    <DropdownMenuItem data-testid="menu-item-my-events">
+                      My Events
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => logout()}
+                    data-testid="menu-item-logout"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <a href="/api/login">
+                <Button variant="default" data-testid="button-login">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem data-testid="menu-item-profile">
-                  <User className="h-4 w-4 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem data-testid="menu-item-my-events">
-                  My Events
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem data-testid="menu-item-logout">
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </a>
+            )}
 
             <Button
               size="icon"
@@ -127,12 +167,21 @@ export function Header() {
                 </Button>
               </Link>
             ))}
-            <Link href="/create">
-              <Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Event
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/create">
+                <Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Event
+                </Button>
+              </Link>
+            ) : (
+              <a href="/api/login">
+                <Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </a>
+            )}
           </div>
         )}
       </div>
