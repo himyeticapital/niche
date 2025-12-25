@@ -1,18 +1,119 @@
 import type { Express } from "express";
+import bcrypt from "bcryptjs";
 import { authStorage } from "./storage";
 import { isAuthenticated } from "./replitAuth";
+import { loginSchema, registerSchema } from "@shared/models/auth";
+import { z } from "zod";
 
 // Register auth-specific routes
 export function registerAuthRoutes(app: Express): void {
-  // Get current authenticated user
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+  // Register new user
+  app.post("/api/auth/register", async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const data = registerSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await authStorage.getUserByEmail(data.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      
+      // Create user
+      const user = await authStorage.upsertUser({
+        email: data.email,
+        password: hashedPassword,
+        firstName: data.firstName,
+        lastName: data.lastName || null,
+      });
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Failed to register" });
+    }
+  });
+
+  // Login user
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const data = loginSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await authStorage.getUserByEmail(data.email);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+      
+      // Check password
+      const isValidPassword = await bcrypt.compare(data.password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Failed to login" });
+    }
+  });
+
+  // Get current authenticated user
+  app.get("/api/auth/user", async (req, res) => {
+    try {
+      const userId = (req.session as any)?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
       const user = await authStorage.getUser(userId);
-      res.json(user);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      // Return user without password
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
+  });
+
+  // Logout user
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.clearCookie("connect.sid");
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  // Keep old logout route for compatibility
+  app.get("/api/logout", (req, res) => {
+    req.session.destroy((err) => {
+      res.redirect("/");
+    });
   });
 }
