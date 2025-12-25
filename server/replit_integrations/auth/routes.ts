@@ -29,12 +29,27 @@ export function registerAuthRoutes(app: Express): void {
         lastName: data.lastName || null,
       });
       
-      // Set session
-      (req.session as any).userId = user.id;
-      
-      // Return user without password
-      const { password: _, ...userWithoutPassword } = user;
-      res.status(201).json(userWithoutPassword);
+      // Regenerate session to prevent session fixation
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ message: "Failed to create session" });
+        }
+        
+        // Set user ID in new session
+        (req.session as any).userId = user.id;
+        
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ message: "Failed to save session" });
+          }
+          
+          // Return user without password
+          const { password: _, ...userWithoutPassword } = user;
+          res.status(201).json(userWithoutPassword);
+        });
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
@@ -61,12 +76,27 @@ export function registerAuthRoutes(app: Express): void {
         return res.status(401).json({ message: "Invalid email or password" });
       }
       
-      // Set session
-      (req.session as any).userId = user.id;
-      
-      // Return user without password
-      const { password: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      // Regenerate session to prevent session fixation
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ message: "Failed to create session" });
+        }
+        
+        // Set user ID in new session
+        (req.session as any).userId = user.id;
+        
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ message: "Failed to save session" });
+          }
+          
+          // Return user without password
+          const { password: _, ...userWithoutPassword } = user;
+          res.json(userWithoutPassword);
+        });
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
