@@ -7,12 +7,12 @@ Niche is a hyperlocal social marketplace that combats urban loneliness by enabli
 **Expansion Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
 
 ## Recent Changes
-- **Dec 25, 2025**: Stripe payment integration
-  - Added Stripe checkout for paid event registrations
-  - Payment dialog with user details form
-  - Automatic attendee registration after successful payment
+- **Dec 25, 2025**: Razorpay payment integration (replaced Stripe)
+  - Added Razorpay embedded checkout for paid event registrations
+  - Secure payment verification with HMAC signature validation
+  - Server-side order/payment fetch to verify eventId, amount, and captured status
+  - Replay attack prevention by checking paymentId in attendee records
   - Free events can be joined directly without payment
-  - Scenic hiking gallery with community-oriented images
 - **Dec 25, 2025**: Bug fixes and improvements
   - Fixed TanStack Query key format in landing page (was causing 404 errors)
   - Added validation for join and review API endpoints
