@@ -10,6 +10,8 @@ import EventsPage from "@/pages/events";
 import EventDetailPage from "@/pages/event-detail";
 import CreateEventPage from "@/pages/create-event";
 import DashboardPage from "@/pages/dashboard";
+import LoginPage from "@/pages/login";
+import SignupPage from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/events/:id" component={EventDetailPage} />
       <Route path="/create" component={CreateEventPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/signup" component={SignupPage} />
       <Route component={NotFound} />
     </Switch>
   );

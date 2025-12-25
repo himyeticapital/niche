@@ -130,12 +130,12 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <a href="/api/login">
+              <Link href="/login">
                 <Button variant="default" data-testid="button-login">
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
-              </a>
+              </Link>
             )}
 
             <Button
@@ -175,12 +175,12 @@ export function Header() {
                 </Button>
               </Link>
             ) : (
-              <a href="/api/login">
+              <Link href="/login">
                 <Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
-              </a>
+              </Link>
             )}
           </div>
         )}
