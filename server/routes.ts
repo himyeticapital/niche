@@ -238,7 +238,7 @@ export async function registerRoutes(
 
       // Create Razorpay order
       const order = await createOrder({
-        amount: event.price,
+        amount: event.price ?? 0,
         currency: 'INR',
         receipt: `event_${event.id}_${Date.now()}`,
         notes: {
@@ -308,7 +308,7 @@ export async function registerRoutes(
       }
 
       // Check capacity
-      if (event.currentAttendees! >= event.maxCapacity) {
+      if ((event.currentAttendees ?? 0) >= event.maxCapacity) {
         return res.status(400).json({ error: "Event is now full" });
       }
 
