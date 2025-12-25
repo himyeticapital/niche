@@ -1,7 +1,7 @@
-# EventHub - Hyperlocal Social Event Marketplace
+# Niche - Hyperlocal Social Event Marketplace
 
 ## Overview
-EventHub is a hyperlocal social marketplace that combats urban loneliness by enabling real-world discovery of niche interest groups within a 5km radius. Unlike generic event platforms, EventHub focuses on authentic community building through passion-based hyperlocal events.
+Niche is a hyperlocal social marketplace that combats urban loneliness by enabling real-world discovery of niche interest groups within a 5km radius. Unlike generic event platforms, Niche focuses on authentic community building through passion-based hyperlocal events.
 
 **Primary Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
 
@@ -90,6 +90,7 @@ shared/
 - Mobile-first responsive approach
 - Focus on genuine human connection
 - No emoji in UI, use icons instead
+- **Dashboard feature is a priority** - User loves the organizer dashboard and wants it enhanced in future iterations
 
 ## Development Commands
 - `npm run dev` - Start development server
