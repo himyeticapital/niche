@@ -14,6 +14,9 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
+import hikingImage1 from "@assets/stock_images/people_hiking_mounta_1850f7b0.jpg";
+import hikingImage2 from "@assets/stock_images/people_hiking_mounta_d422e8db.jpg";
+import hikingImage3 from "@assets/stock_images/people_hiking_mounta_d54ead85.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -164,8 +167,60 @@ export default function LandingPage() {
         </AnimatedStatsContainer>
       </section>
 
-      {/* How It Works */}
+      {/* Scenic Community Gallery */}
       <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+              Adventure Awaits in Sikkim
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Join hiking groups exploring the stunning Himalayan trails around Gangtok
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
+              <img 
+                src={hikingImage1} 
+                alt="Hikers on mountain trail" 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="font-semibold">Sunrise Treks</p>
+                <p className="text-sm text-white/80">Tashi Viewpoint</p>
+              </div>
+            </div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
+              <img 
+                src={hikingImage2} 
+                alt="Group hiking in mountains" 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="font-semibold">Weekend Adventures</p>
+                <p className="text-sm text-white/80">Hanuman Tok Trail</p>
+              </div>
+            </div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
+              <img 
+                src={hikingImage3} 
+                alt="Scenic mountain hiking" 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="font-semibold">Community Hikes</p>
+                <p className="text-sm text-white/80">Tsomgo Lake</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
