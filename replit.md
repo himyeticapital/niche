@@ -91,6 +91,11 @@ shared/
 - Focus on genuine human connection
 - No emoji in UI, use icons instead
 - **Dashboard feature is a priority** - User loves the organizer dashboard and wants it enhanced in future iterations
+- **Color scheme is a favorite** - User loves the purple primary color palette (hsl 262 83% 58%) and wants it preserved
+
+## Priority Features for Future Iterations
+1. **Dashboard** - Enhanced analytics, more detailed metrics, improved visualizations
+2. **Color Scheme** - Keep the purple primary palette, community-focused warm aesthetic
 
 ## Development Commands
 - `npm run dev` - Start development server

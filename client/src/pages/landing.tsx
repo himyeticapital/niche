@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EventCard } from "@/components/event-card";
 import { CategoryPill } from "@/components/category-pill";
 import { StarRating } from "@/components/star-rating";
+import { AnimatedStat, AnimatedStatsContainer } from "@/components/animated-stat";
 import { categories, type Event } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 
@@ -144,25 +145,23 @@ export default function LandingPage() {
 
       {/* Trust Bar */}
       <section className="border-y bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 text-center">
-            <div>
-              <p className="text-2xl md:text-3xl font-bold font-display">10,000+</p>
-              <p className="text-sm text-muted-foreground">Events Hosted</p>
-            </div>
-            <div className="h-8 w-px bg-border hidden md:block" />
-            <div>
-              <p className="text-2xl md:text-3xl font-bold font-display">50+</p>
-              <p className="text-sm text-muted-foreground">Cities</p>
-            </div>
-            <div className="h-8 w-px bg-border hidden md:block" />
-            <div className="flex items-center gap-2">
-              <p className="text-2xl md:text-3xl font-bold font-display">4.8</p>
-              <Star className="h-6 w-6 fill-amber-400 text-amber-400" />
-              <p className="text-sm text-muted-foreground">Average Rating</p>
+        <AnimatedStatsContainer>
+          <div className="mx-auto max-w-7xl px-4 py-8">
+            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+              <AnimatedStat value={10000} suffix="+" label="Events Hosted" />
+              <div className="h-8 w-px bg-border hidden md:block" />
+              <AnimatedStat value={50} suffix="+" label="Cities" />
+              <div className="h-8 w-px bg-border hidden md:block" />
+              <div className="flex flex-col items-center">
+                <div className="flex items-center gap-2">
+                  <AnimatedStat value={4.8} label="" decimals={1} />
+                  <Star className="h-6 w-6 fill-amber-400 text-amber-400" />
+                </div>
+                <p className="text-sm text-muted-foreground">Average Rating</p>
+              </div>
             </div>
           </div>
-        </div>
+        </AnimatedStatsContainer>
       </section>
 
       {/* How It Works */}
