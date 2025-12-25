@@ -19,6 +19,8 @@ export const categories = [
   { id: "social", name: "Social", icon: "users" },
   { id: "fishing", name: "Fishing", icon: "fish" },
   { id: "fitness", name: "Fitness", icon: "dumbbell" },
+  { id: "gaming", name: "Gaming", icon: "gamepad-2" },
+  { id: "art", name: "Art & Creative", icon: "palette" },
 ] as const;
 
 export type CategoryId = typeof categories[number]["id"];
