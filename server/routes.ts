@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertEventSchema, insertAttendeeSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
+import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -205,6 +206,120 @@ export async function registerRoutes(
   app.get("/api/categories", async (req, res) => {
     const { categories } = await import("@shared/schema");
     res.json(categories);
+  });
+
+  // Get Stripe publishable key
+  app.get("/api/stripe/config", async (req, res) => {
+    try {
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (error) {
+      console.error("Error getting Stripe config:", error);
+      res.status(500).json({ error: "Failed to get payment config" });
+    }
+  });
+
+  // Create checkout session for event booking
+  app.post("/api/events/:id/checkout", async (req, res) => {
+    try {
+      const event = await storage.getEvent(req.params.id);
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      if (event.currentAttendees! >= event.maxCapacity) {
+        return res.status(400).json({ error: "Event is full" });
+      }
+
+      const { userName, userPhone, userEmail } = req.body;
+      if (!userName || !userEmail) {
+        return res.status(400).json({ error: "Name and email are required" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      
+      // Create checkout session with event details
+      // Price is in INR (paise), so multiply by 100
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'inr',
+              product_data: {
+                name: event.title,
+                description: `${event.category} event on ${new Date(event.dateTime).toLocaleDateString()}`,
+                images: event.imageUrl ? [event.imageUrl] : [],
+              },
+              unit_amount: event.price * 100, // Convert to paise
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${req.protocol}://${req.get('host')}/events/${event.id}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.protocol}://${req.get('host')}/events/${event.id}?payment=cancelled`,
+        customer_email: userEmail,
+        metadata: {
+          eventId: event.id,
+          userName,
+          userPhone: userPhone || '',
+        },
+      });
+
+      res.json({ url: session.url, sessionId: session.id });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // Verify payment and register attendee
+  app.post("/api/events/:id/verify-payment", async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID required" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+      if (session.payment_status !== 'paid') {
+        return res.status(400).json({ error: "Payment not completed" });
+      }
+
+      const event = await storage.getEvent(req.params.id);
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      // Check if already registered (prevent duplicate registrations)
+      const existingAttendees = await storage.getEventAttendees(req.params.id);
+      const alreadyRegistered = existingAttendees.some(
+        a => a.userId === session.customer_email || a.userName === session.metadata?.userName
+      );
+
+      if (alreadyRegistered) {
+        return res.json({ success: true, message: "Already registered" });
+      }
+
+      // Register attendee
+      const attendeeData = {
+        eventId: req.params.id,
+        userId: session.customer_email || `user-${Date.now()}`,
+        userName: session.metadata?.userName || 'Anonymous',
+        userPhone: session.metadata?.userPhone || '',
+        paymentStatus: 'completed',
+        joinedAt: new Date().toISOString(),
+      };
+
+      const attendee = await storage.addAttendee(attendeeData);
+      res.json({ success: true, attendee });
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      res.status(500).json({ error: "Failed to verify payment" });
+    }
   });
 
   return httpServer;
