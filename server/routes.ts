@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertEventSchema, insertAttendeeSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
-import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
+import { getRazorpayKeyId, createOrder, verifyPaymentSignature } from "./razorpayClient";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -88,7 +88,7 @@ export async function registerRoutes(
     }
   });
 
-  // Join event
+  // Join event (for free events)
   app.post("/api/events/:id/join", async (req, res) => {
     try {
       const event = await storage.getEvent(req.params.id);
@@ -208,19 +208,19 @@ export async function registerRoutes(
     res.json(categories);
   });
 
-  // Get Stripe publishable key
-  app.get("/api/stripe/config", async (req, res) => {
+  // Get Razorpay config (key ID for frontend)
+  app.get("/api/razorpay/config", async (req, res) => {
     try {
-      const publishableKey = await getStripePublishableKey();
-      res.json({ publishableKey });
+      const keyId = getRazorpayKeyId();
+      res.json({ keyId });
     } catch (error) {
-      console.error("Error getting Stripe config:", error);
-      res.status(500).json({ error: "Failed to get payment config" });
+      console.error("Error getting Razorpay config:", error);
+      res.status(500).json({ error: "Payment system not configured. Please add Razorpay credentials." });
     }
   });
 
-  // Create checkout session for event booking
-  app.post("/api/events/:id/checkout", async (req, res) => {
+  // Create Razorpay order for event booking
+  app.post("/api/events/:id/create-order", async (req, res) => {
     try {
       const event = await storage.getEvent(req.params.id);
       if (!event) {
@@ -236,62 +236,56 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Name and email are required" });
       }
 
-      const stripe = await getUncachableStripeClient();
-      
-      // Create checkout session with event details
-      // Price is in INR (paise), so multiply by 100
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price_data: {
-              currency: 'inr',
-              product_data: {
-                name: event.title,
-                description: `${event.category} event on ${new Date(event.dateTime).toLocaleDateString()}`,
-                images: event.imageUrl ? [event.imageUrl] : [],
-              },
-              unit_amount: event.price * 100, // Convert to paise
-            },
-            quantity: 1,
-          },
-        ],
-        mode: 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/events/${event.id}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.protocol}://${req.get('host')}/events/${event.id}?payment=cancelled`,
-        customer_email: userEmail,
-        metadata: {
+      // Create Razorpay order
+      const order = await createOrder({
+        amount: event.price,
+        currency: 'INR',
+        receipt: `event_${event.id}_${Date.now()}`,
+        notes: {
           eventId: event.id,
+          eventTitle: event.title,
           userName,
+          userEmail,
           userPhone: userPhone || '',
         },
       });
 
-      res.json({ url: session.url, sessionId: session.id });
+      res.json({
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: getRazorpayKeyId(),
+        eventTitle: event.title,
+        prefill: {
+          name: userName,
+          email: userEmail,
+          contact: userPhone || '',
+        },
+      });
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      res.status(500).json({ error: "Failed to create checkout session" });
+      console.error("Error creating order:", error);
+      res.status(500).json({ error: "Failed to create payment order" });
     }
   });
 
-  // Verify payment and register attendee
+  // Verify Razorpay payment and register attendee
   app.post("/api/events/:id/verify-payment", async (req, res) => {
     try {
-      const { sessionId } = req.body;
-      if (!sessionId) {
-        return res.status(400).json({ error: "Session ID required" });
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userName, userEmail, userPhone } = req.body;
+      
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({ error: "Payment verification data required" });
       }
 
-      const stripe = await getUncachableStripeClient();
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      // Verify the payment signature
+      const isValid = verifyPaymentSignature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
 
-      if (session.payment_status !== 'paid') {
-        return res.status(400).json({ error: "Payment not completed" });
-      }
-
-      // Security: Verify that the session was created for this specific event
-      if (session.metadata?.eventId !== req.params.id) {
-        return res.status(403).json({ error: "Payment session does not match this event" });
+      if (!isValid) {
+        return res.status(400).json({ error: "Invalid payment signature" });
       }
 
       const event = await storage.getEvent(req.params.id);
@@ -299,19 +293,11 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Event not found" });
       }
 
-      // Get email from customer_email or customer_details
-      const userEmail = session.customer_email || session.customer_details?.email;
-      const userName = session.metadata?.userName;
-      
-      if (!userName) {
-        return res.status(400).json({ error: "Missing attendee name" });
+      if (!userName || !userEmail) {
+        return res.status(400).json({ error: "User details required" });
       }
 
-      if (!userEmail) {
-        return res.status(400).json({ error: "Missing attendee email" });
-      }
-
-      // Check if already registered by email (prevents duplicate registrations)
+      // Check if already registered by email
       const existingAttendees = await storage.getEventAttendees(req.params.id);
       const alreadyRegistered = existingAttendees.some(
         a => a.userId === userEmail
@@ -326,14 +312,13 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Event is now full" });
       }
 
-      // Register attendee - use email as stable userId for consistency with leave endpoint
-      // Store sessionId in paymentStatus to track which Stripe session was used
+      // Register attendee
       const attendeeData = {
         eventId: req.params.id,
         userId: userEmail,
         userName: userName,
-        userPhone: session.metadata?.userPhone || '',
-        paymentStatus: `paid:${sessionId}`, // Include sessionId for audit trail
+        userPhone: userPhone || '',
+        paymentStatus: `paid:${razorpay_payment_id}`,
         joinedAt: new Date().toISOString(),
       };
 
