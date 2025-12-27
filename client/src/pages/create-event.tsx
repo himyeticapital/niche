@@ -556,12 +556,15 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Age Requirement (optional)</FormLabel>
                           <FormControl>
-                            <Select value={field.value} onValueChange={field.onChange}>
+                            <Select 
+                              value={field.value || "none"} 
+                              onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="Any age" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">Any age</SelectItem>
+                                <SelectItem value="none">Any age</SelectItem>
                                 <SelectItem value="18+">18+ only</SelectItem>
                                 <SelectItem value="21+">21+ only</SelectItem>
                                 <SelectItem value="family">Family friendly</SelectItem>
@@ -580,12 +583,15 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Fitness Level (optional)</FormLabel>
                           <FormControl>
-                            <Select value={field.value} onValueChange={field.onChange}>
+                            <Select 
+                              value={field.value || "none"} 
+                              onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="All levels" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">All levels</SelectItem>
+                                <SelectItem value="none">All levels</SelectItem>
                                 <SelectItem value="beginner">Beginner</SelectItem>
                                 <SelectItem value="intermediate">Intermediate</SelectItem>
                                 <SelectItem value="advanced">Advanced</SelectItem>
