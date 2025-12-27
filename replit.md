@@ -7,6 +7,13 @@ Garum is a hyperlocal social marketplace that combats urban loneliness by enabli
 **Expansion Markets**: Bangalore, Pune, Hyderabad, Mumbai (Tier 1 Indian cities)
 
 ## Recent Changes
+- **Dec 27, 2025**: Bug fixes for production
+  - Fixed create event page to use actual logged-in user instead of hardcoded "demo-user"
+  - Removed hardcoded notification badge (3) from header
+  - Fixed user name display in header (was using firstName/lastName, now uses name field)
+  - Added auth check in create event page - redirects to login if not authenticated
+  - Updated event coordinates to Gangtok, Sikkim (MVP trial location)
+  - Improved error logging for registration failures
 - **Dec 25, 2025**: Payment functionality disabled for initial launch
   - All events can be joined directly without payment
   - Razorpay integration code preserved in backend for future activation
