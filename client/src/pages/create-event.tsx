@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -72,10 +72,11 @@ export default function CreateEventPage() {
   const totalSteps = 3;
 
   // Redirect to login if not authenticated
-  if (!authLoading && !isAuthenticated) {
-    navigate("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -158,6 +159,20 @@ export default function CreateEventPage() {
   const selectedCategory = form.watch("category");
   const price = form.watch("price");
   const isRecurring = form.watch("isRecurring");
+
+  // Show loading state while auth is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (redirect is happening)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen pb-16">
