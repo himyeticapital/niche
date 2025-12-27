@@ -1,4 +1,4 @@
-import { users, type User, type UpsertUser } from "@shared/models/auth";
+import { users, type User } from "@shared/models/auth";
 import { db } from "../../db";
 import { eq } from "drizzle-orm";
 
@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 export interface IAuthStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  upsertUser(user: Omit<UpsertUser, "id">): Promise<User>;
+  createUser(data: { email: string; password: string; name: string; username: string }): Promise<User>;
 }
 
 class AuthStorage implements IAuthStorage {
@@ -20,18 +20,14 @@ class AuthStorage implements IAuthStorage {
     return user;
   }
 
-  async upsertUser(userData: Omit<UpsertUser, "id">): Promise<User> {
+  async createUser(data: { email: string; password: string; name: string; username: string }): Promise<User> {
     const [user] = await db
       .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.email,
-        set: {
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          profileImageUrl: userData.profileImageUrl,
-          updatedAt: new Date(),
-        },
+      .values({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        username: data.username,
       })
       .returning();
     return user;

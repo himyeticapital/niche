@@ -21,12 +21,15 @@ export function registerAuthRoutes(app: Express): void {
       // Hash password
       const hashedPassword = await bcrypt.hash(data.password, 10);
       
+      // Generate username from email (before the @ symbol)
+      const username = data.email.split("@")[0] + "_" + Date.now().toString(36);
+      
       // Create user
-      const user = await authStorage.upsertUser({
+      const user = await authStorage.createUser({
         email: data.email,
         password: hashedPassword,
-        firstName: data.firstName,
-        lastName: data.lastName || null,
+        name: data.name,
+        username: username,
       });
       
       // Regenerate session to prevent session fixation
