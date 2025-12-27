@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/form";
 import { CategoryPill } from "@/components/category-pill";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { categories } from "@shared/schema";
 
@@ -66,8 +67,15 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 export default function CreateEventPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 3;
+
+  // Redirect to login if not authenticated
+  if (!authLoading && !isAuthenticated) {
+    navigate("/login");
+    return null;
+  }
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -92,15 +100,18 @@ export default function CreateEventPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: EventFormValues) => {
+      if (!user) {
+        throw new Error("You must be logged in to create an event");
+      }
       return apiRequest("POST", "/api/events", {
         ...data,
-        latitude: 12.9716 + Math.random() * 0.1,
-        longitude: 77.5946 + Math.random() * 0.1,
-        organizerId: "demo-user",
-        organizerName: "Demo Organizer",
-        organizerVerified: true,
-        organizerRating: 4.8,
-        organizerReviewCount: 47,
+        latitude: 27.3314 + Math.random() * 0.01,
+        longitude: 88.6138 + Math.random() * 0.01,
+        organizerId: user.id,
+        organizerName: user.name,
+        organizerVerified: user.isVerified || false,
+        organizerRating: user.rating || 0,
+        organizerReviewCount: user.reviewCount || 0,
         isFeatured: false,
       });
     },

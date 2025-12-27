@@ -26,9 +26,12 @@ export function Header() {
 
   const getInitials = () => {
     if (!user) return "U";
-    const first = user.firstName?.[0] || "";
-    const last = user.lastName?.[0] || "";
-    return (first + last) || user.email?.[0]?.toUpperCase() || "U";
+    const name = user.name || "";
+    const parts = name.split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U";
   };
 
   return (
@@ -70,13 +73,9 @@ export function Header() {
               <Button
                 size="icon"
                 variant="ghost"
-                className="relative"
                 data-testid="button-notifications"
               >
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                  3
-                </span>
               </Button>
             )}
 
@@ -93,8 +92,8 @@ export function Header() {
                     data-testid="button-user-menu"
                   >
                     <Avatar className="h-8 w-8">
-                      {user?.profileImageUrl && (
-                        <AvatarImage src={user.profileImageUrl} alt={user.firstName || "User"} />
+                      {user?.avatar && (
+                        <AvatarImage src={user.avatar} alt={user.name || "User"} />
                       )}
                       <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                         {getInitials()}
@@ -104,7 +103,7 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5 text-sm font-medium">
-                    {user?.firstName} {user?.lastName}
+                    {user?.name}
                   </div>
                   <div className="px-2 pb-1.5 text-xs text-muted-foreground">
                     {user?.email}
