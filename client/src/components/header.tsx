@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { MapPin, Plus, Menu, X, Bell, User, LogIn, LogOut } from "lucide-react";
+import { MapPin, Plus, Menu, X, Bell, User, LogIn, LogOut, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState } from "react";
@@ -12,9 +12,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function Header() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isLoading, isAuthenticated, logout } = useAuth();
 
@@ -70,13 +75,31 @@ export function Header() {
             )}
 
             {isAuthenticated && (
-              <Button
-                size="icon"
-                variant="ghost"
-                data-testid="button-notifications"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    data-testid="button-notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold">Notifications</h4>
+                  </div>
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-3">
+                      <BellOff className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">No notifications yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You'll see updates about your events here
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
 
             <ThemeToggle />
@@ -109,20 +132,22 @@ export function Header() {
                     {user?.email}
                   </div>
                   <DropdownMenuSeparator />
-                  <Link href="/profile">
-                    <DropdownMenuItem data-testid="menu-item-profile">
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/dashboard">
-                    <DropdownMenuItem data-testid="menu-item-my-events">
-                      My Events
-                    </DropdownMenuItem>
-                  </Link>
+                  <DropdownMenuItem 
+                    onSelect={() => setLocation("/profile")}
+                    data-testid="menu-item-profile"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onSelect={() => setLocation("/dashboard")}
+                    data-testid="menu-item-my-events"
+                  >
+                    My Events
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
-                    onClick={() => logout()}
+                    onSelect={() => logout()}
                     data-testid="menu-item-logout"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
