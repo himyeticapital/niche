@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
+import { useLocation, Redirect } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,12 +71,6 @@ export default function CreateEventPage() {
   const [step, setStep] = useState(1);
   const totalSteps = 3;
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/login");
-    }
-  }, [authLoading, isAuthenticated, navigate]);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -169,9 +163,9 @@ export default function CreateEventPage() {
     );
   }
 
-  // Don't render if not authenticated (redirect is happening)
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return null;
+    return <Redirect to="/login" replace />;
   }
 
   return (
