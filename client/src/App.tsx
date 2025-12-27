@@ -12,6 +12,7 @@ import CreateEventPage from "@/pages/create-event";
 import DashboardPage from "@/pages/dashboard";
 import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
+import ProfilePage from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/signup" component={SignupPage} />
+      <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );
