@@ -58,7 +58,9 @@ export function registerAuthRoutes(app: Express): void {
         return res.status(400).json({ message: error.errors[0].message });
       }
       console.error("Registration error:", error);
-      res.status(500).json({ message: "Failed to register" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Registration error details:", errorMessage);
+      res.status(500).json({ message: `Failed to register: ${errorMessage}` });
     }
   });
 
