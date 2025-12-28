@@ -26,7 +26,7 @@ export function Header() {
   const navItems = [
     { href: "/", label: "Discover" },
     { href: "/events", label: "Events" },
-    { href: "/dashboard", label: "Dashboard" },
+    ...(isAuthenticated ? [{ href: "/dashboard", label: "Dashboard" }] : []),
   ];
 
   const getInitials = () => {

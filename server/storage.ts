@@ -27,6 +27,7 @@ export interface IStorage {
 
   // Attendees
   getEventAttendees(eventId: string): Promise<Attendee[]>;
+  getOrganizerAttendees(organizerId: string): Promise<Attendee[]>;
   addAttendee(attendee: InsertAttendee): Promise<Attendee>;
   removeAttendee(eventId: string, userId: string): Promise<boolean>;
   checkInAttendee(eventId: string, attendeeId: string): Promise<boolean>;
@@ -729,6 +730,18 @@ export class MemStorage implements IStorage {
   async getEventAttendees(eventId: string): Promise<Attendee[]> {
     return Array.from(this.attendees.values()).filter(
       (a) => a.eventId === eventId
+    );
+  }
+
+  async getOrganizerAttendees(organizerId: string): Promise<Attendee[]> {
+    // Get all events for this organizer
+    const organizerEventIds = Array.from(this.events.values())
+      .filter((e) => e.organizerId === organizerId)
+      .map((e) => e.id);
+    
+    // Get all attendees for those events
+    return Array.from(this.attendees.values()).filter(
+      (a) => organizerEventIds.includes(a.eventId)
     );
   }
 

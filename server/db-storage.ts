@@ -100,6 +100,24 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(eventAttendees).where(eq(eventAttendees.eventId, eventId));
   }
 
+  async getOrganizerAttendees(organizerId: string): Promise<Attendee[]> {
+    // Get all events for this organizer
+    const organizerEvents = await db
+      .select()
+      .from(events)
+      .where(eq(events.organizerId, organizerId));
+    
+    const organizerEventIds = organizerEvents.map((e) => e.id);
+    
+    if (organizerEventIds.length === 0) {
+      return [];
+    }
+    
+    // Get all attendees for those events
+    const allAttendees = await db.select().from(eventAttendees);
+    return allAttendees.filter((a) => organizerEventIds.includes(a.eventId));
+  }
+
   async addAttendee(insertAttendee: InsertAttendee): Promise<Attendee> {
     const [attendee] = await db
       .insert(eventAttendees)

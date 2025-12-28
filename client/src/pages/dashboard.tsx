@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, Redirect } from "wouter";
 import {
   IndianRupee,
   Calendar,
@@ -33,18 +33,57 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Event, DashboardStats } from "@shared/schema";
+import type { Event, DashboardStats, Attendee } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function DashboardPage() {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ["/api/organizer/dashboard"],
+    queryKey: ["/api/organizer/dashboard", user?.id],
+    queryFn: async () => {
+      const res = await fetch(`/api/organizer/dashboard?organizerId=${user?.id}`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      return res.json();
+    },
+    enabled: !!user?.id,
   });
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
+    enabled: !!user?.id,
   });
 
-  const myEvents = events.filter((e) => e.organizerId === "demo-user");
+  const { data: allAttendees = [] } = useQuery<Attendee[]>({
+    queryKey: ["/api/organizer/attendees", user?.id],
+    queryFn: async () => {
+      const res = await fetch(`/api/organizer/attendees?organizerId=${user?.id}`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch attendees");
+      return res.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  // Show loading while auth is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Redirect to="/login" replace />;
+  }
+
+  // Filter events by the actual logged-in user
+  const myEvents = events.filter((e) => e.organizerId === user?.id);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -303,24 +342,22 @@ export default function DashboardPage() {
             {/* Quick Stats */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">This Month</CardTitle>
+                <CardTitle className="text-base">Your Stats</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Events hosted</span>
-                  <span className="font-semibold">8</span>
+                  <span className="font-semibold">{myEvents.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">New attendees</span>
-                  <span className="font-semibold">47</span>
+                  <span className="text-muted-foreground">Total attendees</span>
+                  <span className="font-semibold">{allAttendees.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Repeat attendees</span>
-                  <span className="font-semibold">23</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Cancellation rate</span>
-                  <span className="font-semibold text-emerald-600">2%</span>
+                  <span className="text-muted-foreground">Avg per event</span>
+                  <span className="font-semibold">
+                    {myEvents.length > 0 ? Math.round(allAttendees.length / myEvents.length) : 0}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -329,70 +366,35 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle className="text-base">Recent Attendees</CardTitle>
-                <Button variant="ghost" size="sm">
-                  View All
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {[
-                    { name: "Priya S.", event: "Morning Run", time: "2h ago" },
-                    { name: "Rahul V.", event: "Board Game Night", time: "5h ago" },
-                    { name: "Anita M.", event: "Dog Park Meetup", time: "1d ago" },
-                    { name: "Vikram K.", event: "Morning Run", time: "1d ago" },
-                  ].map((attendee, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                          {attendee.name.slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{attendee.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {attendee.event}
-                        </p>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {attendee.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Pending Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Pending Actions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 bg-amber-500/10 rounded-lg">
-                    <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                      <Star className="h-4 w-4 text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">2 new reviews</p>
-                      <p className="text-xs text-muted-foreground">
-                        Reply to build trust
-                      </p>
-                    </div>
+                {allAttendees.length === 0 ? (
+                  <div className="text-center py-4">
+                    <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No attendees yet</p>
                   </div>
-                  <div className="flex items-start gap-3 p-3 bg-emerald-500/10 rounded-lg">
-                    <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                      <IndianRupee className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Payout ready</p>
-                      <p className="text-xs text-muted-foreground">
-                        4,500 available
-                      </p>
-                    </div>
+                ) : (
+                  <div className="space-y-3">
+                    {allAttendees.slice(0, 4).map((attendee, i) => {
+                      const event = myEvents.find(e => e.id === attendee.eventId);
+                      return (
+                        <div key={i} className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                              {attendee.userName.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm">{attendee.userName}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {event?.title || "Event"}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 

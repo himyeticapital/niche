@@ -193,12 +193,37 @@ export async function registerRoutes(
   // Get organizer dashboard stats
   app.get("/api/organizer/dashboard", async (req, res) => {
     try {
-      const organizerId = (req.query.organizerId as string) || "demo-user";
+      const organizerId = req.query.organizerId as string;
+      if (!organizerId) {
+        // Return empty stats if no organizerId provided (backward compatible)
+        return res.json({
+          totalRevenue: 0,
+          totalEvents: 0,
+          totalAttendees: 0,
+          averageRating: 0,
+        });
+      }
       const stats = await storage.getDashboardStats(organizerId);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Get attendees for organizer's events
+  app.get("/api/organizer/attendees", async (req, res) => {
+    try {
+      const organizerId = req.query.organizerId as string;
+      if (!organizerId) {
+        // Return empty array if no organizerId provided (backward compatible)
+        return res.json([]);
+      }
+      const attendees = await storage.getOrganizerAttendees(organizerId);
+      res.json(attendees);
+    } catch (error) {
+      console.error("Error fetching organizer attendees:", error);
+      res.status(500).json({ error: "Failed to fetch attendees" });
     }
   });
 
