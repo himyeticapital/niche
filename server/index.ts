@@ -3,6 +3,8 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedDatabase } from "./seedOnStartup";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
@@ -67,14 +69,15 @@ app.use((req, res, next) => {
   }
 
   const port = parseInt(process.env.PORT || "5000", 10);
+  const host = process.env.REPL_OWNER === "local" ? "127.0.0.1" : "0.0.0.0";
   httpServer.listen(
     {
       port,
-      host: "0.0.0.0",
-      reusePort: true,
+      host: host,
+      // reusePort: true, // Uncomment if needed for clustering
     },
     () => {
       log(`serving on port ${port}`);
-    },
+    }
   );
 })();
