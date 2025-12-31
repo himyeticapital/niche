@@ -552,7 +552,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Join thousands of people who have found their tribe through
-            Niche. Your community is waiting.
+            Garum. Your community is waiting.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/events">

@@ -125,7 +125,7 @@ export function Footer() {
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            2025 Niche. All rights reserved.
+            2025 Garum. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
