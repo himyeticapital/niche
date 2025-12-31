@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -37,17 +38,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Event, Review } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     userName: "",
     userPhone: "",
   });
+
+  const [reviewForm, setReviewForm] = useState({
+    rating: 0,
+    comment: "",
+  });
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const { data: event, isLoading } = useQuery<Event>({
     queryKey: ["/api/events", id],
@@ -85,6 +94,48 @@ export default function EventDetailPage() {
       });
     },
   });
+
+  const reviewMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", `/api/events/${id}/reviews`, {
+        userId: user?.id || `guest-${Date.now()}`,
+        userName: user?.name || "Anonymous",
+        userAvatar: user?.avatar || "",
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+        createdAt: new Date().toISOString(),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/events", id, "reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
+      setReviewForm({ rating: 0, comment: "" });
+      setShowReviewForm(false);
+      toast({
+        title: "Review submitted!",
+        description: "Thank you for sharing your experience.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to submit review",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleReviewSubmit = () => {
+    if (reviewForm.rating === 0) {
+      toast({
+        title: "Rating required",
+        description: "Please select a star rating.",
+        variant: "destructive",
+      });
+      return;
+    }
+    reviewMutation.mutate();
+  };
 
   const handleJoinClick = () => {
     setShowPaymentDialog(true);
@@ -349,13 +400,77 @@ export default function EventDetailPage() {
 
             {/* Reviews */}
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
                 <h2 className="text-xl font-semibold">
                   Reviews ({reviews.length})
                 </h2>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowReviewForm(!showReviewForm)}
+                  data-testid="button-write-review"
+                >
+                  {showReviewForm ? "Cancel" : "Write a Review"}
+                </Button>
               </div>
 
-              {reviews.length === 0 ? (
+              {/* Review Form */}
+              {showReviewForm && (
+                <Card className="mb-4">
+                  <CardContent className="p-4 space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Your Rating</Label>
+                      <StarRating
+                        rating={reviewForm.rating}
+                        showCount={false}
+                        size="lg"
+                        interactive
+                        onRatingChange={(rating) => setReviewForm({ ...reviewForm, rating })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="review-comment" className="text-sm font-medium mb-2 block">
+                        Your Review (optional)
+                      </Label>
+                      <Textarea
+                        id="review-comment"
+                        placeholder="Share your experience at this event..."
+                        value={reviewForm.comment}
+                        onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                        rows={4}
+                        data-testid="textarea-review-comment"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowReviewForm(false);
+                          setReviewForm({ rating: 0, comment: "" });
+                        }}
+                        data-testid="button-cancel-review"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleReviewSubmit}
+                        disabled={reviewMutation.isPending || reviewForm.rating === 0}
+                        data-testid="button-submit-review"
+                      >
+                        {reviewMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          "Submit Review"
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {reviews.length === 0 && !showReviewForm ? (
                 <Card>
                   <CardContent className="p-8 text-center">
                     <p className="text-muted-foreground">
@@ -363,10 +478,10 @@ export default function EventDetailPage() {
                     </p>
                   </CardContent>
                 </Card>
-              ) : (
+              ) : reviews.length > 0 ? (
                 <div className="space-y-4">
                   {reviews.map((review) => (
-                    <Card key={review.id}>
+                    <Card key={review.id} data-testid={`review-card-${review.id}`}>
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <Avatar className="h-10 w-10">
@@ -403,7 +518,7 @@ export default function EventDetailPage() {
                     </Card>
                   ))}
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
 

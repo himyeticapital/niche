@@ -4,6 +4,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedDatabase } from "./seedOnStartup";
 import dotenv from "dotenv";
+import path from "path";
 dotenv.config();
 
 const app = express();
@@ -11,6 +12,11 @@ const httpServer = createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(
+  "/assets",
+  express.static(path.resolve(process.cwd(), "attached_assets"))
+);
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {

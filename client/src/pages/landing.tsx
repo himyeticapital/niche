@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import {
   MapPin,
@@ -14,9 +15,24 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
-import hikingImage1 from "@assets/stock_images/people_hiking_mounta_1850f7b0.jpg";
-import hikingImage2 from "@assets/stock_images/group_of_friends_hik_bf1e86b7.jpg";
-import hikingImage3 from "@assets/stock_images/people_hiking_mounta_d54ead85.jpg";
+// Hiking images
+import hikingImage1 from "@assets/stock_images/people_hiking_mounta_7858dfa2.jpg";
+import hikingImage2 from "@assets/stock_images/people_hiking_mounta_b34f990b.jpg";
+// Community yoga/activities
+import communityImage1 from "@assets/stock_images/group_of_friends_com_3f5839a4.jpg";
+import communityImage2 from "@assets/stock_images/group_of_friends_com_2c7b78f3.jpg";
+// Himalayan monasteries/Sikkim
+import monasteryImage1 from "@assets/stock_images/himalayan_monastery__bf8b8093.jpg";
+import monasteryImage2 from "@assets/stock_images/himalayan_monastery__eabed9cc.jpg";
+// Board games/social gatherings
+import boardGamesImage1 from "@assets/stock_images/people_board_games_c_23537000.jpg";
+import boardGamesImage2 from "@assets/stock_images/people_board_games_c_37ac7839.jpg";
+// Cycling/biking
+import cyclingImage1 from "@assets/stock_images/people_cycling_bikin_99294cb5.jpg";
+import cyclingImage2 from "@assets/stock_images/people_cycling_bikin_33c05549.jpg";
+// Art workshops
+import artImage1 from "@assets/stock_images/art_workshop_paintin_61252cb8.jpg";
+import artImage2 from "@assets/stock_images/art_workshop_paintin_d53280fd.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -31,6 +47,50 @@ export default function LandingPage() {
   const { data: featuredEvents = [], isLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
   });
+
+  const galleryImages = [
+    hikingImage1, hikingImage2, 
+    communityImage1, communityImage2, 
+    monasteryImage1, monasteryImage2,
+    boardGamesImage1, boardGamesImage2,
+    cyclingImage1, cyclingImage2,
+    artImage1, artImage2
+  ];
+  const [currentIndices, setCurrentIndices] = useState([0, 3, 6]);
+
+  useEffect(() => {
+    const intervals = [
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          (prev[0] + 1) % galleryImages.length,
+          prev[1],
+          prev[2]
+        ]);
+      }, 3500),
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          prev[0],
+          (prev[1] + 1) % galleryImages.length,
+          prev[2]
+        ]);
+      }, 4500),
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          prev[0],
+          prev[1],
+          (prev[2] + 1) % galleryImages.length
+        ]);
+      }, 5500),
+    ];
+
+    return () => intervals.forEach(clearInterval);
+  }, []);
+
+  const galleryLabels = [
+    { title: "Mountain Adventures", subtitle: "Himalayan Trails" },
+    { title: "Community Gatherings", subtitle: "New Friendships" },
+    { title: "Local Experiences", subtitle: "Discover Sikkim" },
+  ];
 
   const testimonials = [
     {
@@ -179,42 +239,26 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage1} 
-                alt="Hikers on mountain trail" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Sunrise Treks</p>
-                <p className="text-sm text-white/80">Tashi Viewpoint</p>
+            {galleryLabels.map((label, cardIndex) => (
+              <div key={cardIndex} className="relative aspect-[4/3] overflow-hidden rounded-md group">
+                {galleryImages.map((img, imgIndex) => (
+                  <img
+                    key={imgIndex}
+                    src={img}
+                    alt={`${label.title} - hiking scene`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 group-hover:scale-105 ${
+                      currentIndices[cardIndex] === imgIndex ? "opacity-100" : "opacity-0"
+                    }`}
+                    style={{ transition: "opacity 1s ease-in-out, transform 0.3s ease" }}
+                  />
+                ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 text-white">
+                  <p className="font-semibold">{label.title}</p>
+                  <p className="text-sm text-white/80">{label.subtitle}</p>
+                </div>
               </div>
-            </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage2} 
-                alt="Friends hiking together" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Weekend Adventures</p>
-                <p className="text-sm text-white/80">With New Friends</p>
-              </div>
-            </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage3} 
-                alt="Scenic mountain hiking" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Community Hikes</p>
-                <p className="text-sm text-white/80">Tsomgo Lake</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -508,7 +552,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Join thousands of people who have found their tribe through
-            Niche. Your community is waiting.
+            Garum. Your community is waiting.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/events">
