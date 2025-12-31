@@ -15,10 +15,24 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
-import hikingImage1 from "@assets/stock_images/people_hiking_mounta_1850f7b0.jpg";
-import hikingImage2 from "@assets/stock_images/group_of_friends_hik_bf1e86b7.jpg";
-import hikingImage3 from "@assets/stock_images/people_hiking_mounta_d54ead85.jpg";
-import hikingImage4 from "@assets/stock_images/people_hiking_mounta_d422e8db.jpg";
+// Hiking images
+import hikingImage1 from "@assets/stock_images/people_hiking_mounta_7858dfa2.jpg";
+import hikingImage2 from "@assets/stock_images/people_hiking_mounta_b34f990b.jpg";
+// Community yoga/activities
+import communityImage1 from "@assets/stock_images/group_of_friends_com_3f5839a4.jpg";
+import communityImage2 from "@assets/stock_images/group_of_friends_com_2c7b78f3.jpg";
+// Himalayan monasteries/Sikkim
+import monasteryImage1 from "@assets/stock_images/himalayan_monastery__bf8b8093.jpg";
+import monasteryImage2 from "@assets/stock_images/himalayan_monastery__eabed9cc.jpg";
+// Board games/social gatherings
+import boardGamesImage1 from "@assets/stock_images/people_board_games_c_23537000.jpg";
+import boardGamesImage2 from "@assets/stock_images/people_board_games_c_37ac7839.jpg";
+// Cycling/biking
+import cyclingImage1 from "@assets/stock_images/people_cycling_bikin_99294cb5.jpg";
+import cyclingImage2 from "@assets/stock_images/people_cycling_bikin_33c05549.jpg";
+// Art workshops
+import artImage1 from "@assets/stock_images/art_workshop_paintin_61252cb8.jpg";
+import artImage2 from "@assets/stock_images/art_workshop_paintin_d53280fd.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -34,8 +48,15 @@ export default function LandingPage() {
     queryKey: ["/api/events"],
   });
 
-  const galleryImages = [hikingImage1, hikingImage2, hikingImage3, hikingImage4];
-  const [currentIndices, setCurrentIndices] = useState([0, 1, 2]);
+  const galleryImages = [
+    hikingImage1, hikingImage2, 
+    communityImage1, communityImage2, 
+    monasteryImage1, monasteryImage2,
+    boardGamesImage1, boardGamesImage2,
+    cyclingImage1, cyclingImage2,
+    artImage1, artImage2
+  ];
+  const [currentIndices, setCurrentIndices] = useState([0, 3, 6]);
 
   useEffect(() => {
     const intervals = [
@@ -45,30 +66,30 @@ export default function LandingPage() {
           prev[1],
           prev[2]
         ]);
-      }, 4000),
+      }, 3500),
       setInterval(() => {
         setCurrentIndices(prev => [
           prev[0],
           (prev[1] + 1) % galleryImages.length,
           prev[2]
         ]);
-      }, 5000),
+      }, 4500),
       setInterval(() => {
         setCurrentIndices(prev => [
           prev[0],
           prev[1],
           (prev[2] + 1) % galleryImages.length
         ]);
-      }, 6000),
+      }, 5500),
     ];
 
     return () => intervals.forEach(clearInterval);
   }, []);
 
   const galleryLabels = [
-    { title: "Sunrise Treks", subtitle: "Tashi Viewpoint" },
-    { title: "Weekend Adventures", subtitle: "With New Friends" },
-    { title: "Community Hikes", subtitle: "Tsomgo Lake" },
+    { title: "Mountain Adventures", subtitle: "Himalayan Trails" },
+    { title: "Community Gatherings", subtitle: "New Friendships" },
+    { title: "Local Experiences", subtitle: "Discover Sikkim" },
   ];
 
   const testimonials = [
