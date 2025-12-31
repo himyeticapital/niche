@@ -2,8 +2,21 @@ import { Link, useLocation } from "wouter";
 import { MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@shared/models/auth";
@@ -52,7 +65,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="flex items-center justify-center gap-2 mb-4">
+          <Link
+            href="/"
+            className="flex items-center justify-center gap-2 mb-4"
+          >
             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary">
               <MapPin className="h-6 w-6 text-primary-foreground" />
             </div>
@@ -119,7 +135,11 @@ export default function LoginPage() {
           </Form>
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline" data-testid="link-signup">
+            <Link
+              href="/signup"
+              className="text-primary hover:underline"
+              data-testid="link-signup"
+            >
               Sign up
             </Link>
           </div>

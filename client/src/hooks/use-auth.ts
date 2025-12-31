@@ -20,7 +20,7 @@ async function fetchUser(): Promise<User | null> {
 
 export function useAuth() {
   const queryClient = useQueryClient();
-  
+
   const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     queryFn: fetchUser,
@@ -39,7 +39,11 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; name: string }) => {
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      name: string;
+    }) => {
       const response = await apiRequest("POST", "/api/auth/register", data);
       return response.json();
     },
