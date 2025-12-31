@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import {
@@ -9,6 +9,7 @@ import {
   List,
   Map,
   X,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,43 @@ export default function EventsPage() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [sortBy, setSortBy] = useState("date");
+  const [userLocation, setUserLocation] = useState({ name: "Gangtok, Sikkim", lat: 27.3314, lng: 88.6138 });
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      setIsDetectingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+            );
+            const data = await response.json();
+            const city = data.address?.city || data.address?.town || data.address?.village || "Your Location";
+            const state = data.address?.state || "";
+            setUserLocation({
+              name: state ? `${city}, ${state}` : city,
+              lat: latitude,
+              lng: longitude,
+            });
+          } catch {
+            setUserLocation({
+              name: "Your Location",
+              lat: latitude,
+              lng: longitude,
+            });
+          }
+          setIsDetectingLocation(false);
+        },
+        () => {
+          setIsDetectingLocation(false);
+        },
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    }
+  }, []);
 
   const { data: events = [], isLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
@@ -116,8 +154,12 @@ export default function EventsPage() {
 
             {/* Location */}
             <Button variant="outline" className="gap-2" data-testid="button-location">
-              <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Bangalore</span>
+              {isDetectingLocation ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MapPin className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">{userLocation.name}</span>
               <span className="text-muted-foreground">({maxDistance[0]}km)</span>
             </Button>
 
