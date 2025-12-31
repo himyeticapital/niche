@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import {
   MapPin,
@@ -17,6 +18,7 @@ import {
 import hikingImage1 from "@assets/stock_images/people_hiking_mounta_1850f7b0.jpg";
 import hikingImage2 from "@assets/stock_images/group_of_friends_hik_bf1e86b7.jpg";
 import hikingImage3 from "@assets/stock_images/people_hiking_mounta_d54ead85.jpg";
+import hikingImage4 from "@assets/stock_images/people_hiking_mounta_d422e8db.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -31,6 +33,43 @@ export default function LandingPage() {
   const { data: featuredEvents = [], isLoading } = useQuery<Event[]>({
     queryKey: ["/api/events"],
   });
+
+  const galleryImages = [hikingImage1, hikingImage2, hikingImage3, hikingImage4];
+  const [currentIndices, setCurrentIndices] = useState([0, 1, 2]);
+
+  useEffect(() => {
+    const intervals = [
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          (prev[0] + 1) % galleryImages.length,
+          prev[1],
+          prev[2]
+        ]);
+      }, 4000),
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          prev[0],
+          (prev[1] + 1) % galleryImages.length,
+          prev[2]
+        ]);
+      }, 5000),
+      setInterval(() => {
+        setCurrentIndices(prev => [
+          prev[0],
+          prev[1],
+          (prev[2] + 1) % galleryImages.length
+        ]);
+      }, 6000),
+    ];
+
+    return () => intervals.forEach(clearInterval);
+  }, []);
+
+  const galleryLabels = [
+    { title: "Sunrise Treks", subtitle: "Tashi Viewpoint" },
+    { title: "Weekend Adventures", subtitle: "With New Friends" },
+    { title: "Community Hikes", subtitle: "Tsomgo Lake" },
+  ];
 
   const testimonials = [
     {
@@ -179,42 +218,26 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage1} 
-                alt="Hikers on mountain trail" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Sunrise Treks</p>
-                <p className="text-sm text-white/80">Tashi Viewpoint</p>
+            {galleryLabels.map((label, cardIndex) => (
+              <div key={cardIndex} className="relative aspect-[4/3] overflow-hidden rounded-md group">
+                {galleryImages.map((img, imgIndex) => (
+                  <img
+                    key={imgIndex}
+                    src={img}
+                    alt={`${label.title} - hiking scene`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 group-hover:scale-105 ${
+                      currentIndices[cardIndex] === imgIndex ? "opacity-100" : "opacity-0"
+                    }`}
+                    style={{ transition: "opacity 1s ease-in-out, transform 0.3s ease" }}
+                  />
+                ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 text-white">
+                  <p className="font-semibold">{label.title}</p>
+                  <p className="text-sm text-white/80">{label.subtitle}</p>
+                </div>
               </div>
-            </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage2} 
-                alt="Friends hiking together" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Weekend Adventures</p>
-                <p className="text-sm text-white/80">With New Friends</p>
-              </div>
-            </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-md group">
-              <img 
-                src={hikingImage3} 
-                alt="Scenic mountain hiking" 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="font-semibold">Community Hikes</p>
-                <p className="text-sm text-white/80">Tsomgo Lake</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
