@@ -3,12 +3,15 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedDatabase } from "./seedOnStartup";
+import path from "path";
 
 const app = express();
 const httpServer = createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use("/assets", express.static(path.resolve(process.cwd(), "attached_assets")));
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
