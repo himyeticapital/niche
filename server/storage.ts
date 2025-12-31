@@ -61,7 +61,7 @@ export class MemStorage implements IStorage {
         id: "evt-1",
         title: "Sunrise Hiking at Tashi Viewpoint",
         description: "Join us for a beautiful sunrise hike to Tashi Viewpoint! Experience breathtaking views of Kanchenjunga as the sun rises over the Himalayas.\n\nWhat to bring:\n- Warm layers (it gets cold!)\n- Water bottle\n- Camera for the views\n- Comfortable hiking shoes\n\nWe'll meet at MG Marg and carpool together. Hot chai and momos after the hike!",
-        category: "running",
+        category: "hiking",
         interests: ["fitness", "outdoor", "nature"],
         coverImage: "",
         date: "2025-12-28",
