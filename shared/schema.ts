@@ -1,60 +1,48 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, boolean, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  varchar,
+  integer,
+  real,
+  boolean,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { categories } from "./utils/constants";
+// Import models
+import { users } from "./models/users";
+import { userPreferences } from "./models/user_preference";
+import * as relations from "./relations";
 
-// Categories for events
-export const categories = [
-  { id: "running", name: "Running", icon: "running" },
-  { id: "hiking", name: "Hiking", icon: "mountain" },
-  { id: "dog-parents", name: "Dog Parents", icon: "dog" },
-  { id: "board-games", name: "Board Games", icon: "dice" },
-  { id: "photography", name: "Photography", icon: "camera" },
-  { id: "cooking", name: "Cooking", icon: "chef-hat" },
-  { id: "yoga", name: "Yoga", icon: "heart" },
-  { id: "meditation", name: "Meditation", icon: "brain" },
-  { id: "book-clubs", name: "Book Clubs", icon: "book" },
-  { id: "sports", name: "Sports", icon: "trophy" },
-  { id: "outdoor", name: "Outdoor", icon: "trees" },
-  { id: "social", name: "Social", icon: "users" },
-  { id: "fishing", name: "Fishing", icon: "fish" },
-  { id: "fitness", name: "Fitness", icon: "dumbbell" },
-  { id: "gaming", name: "Gaming", icon: "gamepad-2" },
-  { id: "art", name: "Art & Creative", icon: "palette" },
-] as const;
+export type CategoryId = (typeof categories)[number]["id"];
 
-export type CategoryId = typeof categories[number]["id"];
-
-// Users table
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
-  email: text("email"),
-  phone: text("phone"),
-  avatar: text("avatar"),
-  bio: text("bio"),
-  isVerified: boolean("is_verified").default(false),
-  isOrganizer: boolean("is_organizer").default(false),
-  eventsHosted: integer("events_hosted").default(0),
-  rating: real("rating").default(0),
-  reviewCount: integer("review_count").default(0),
-});
-
+// User Table Schema
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   eventsHosted: true,
   rating: true,
   reviewCount: true,
 });
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// User Preferences Table Schema
+export const insertUserPreferenceSchema = createInsertSchema(
+  userPreferences
+).omit({
+  id: true,
+  lastUpdated: true,
+});
+export type InsertUserPreference = z.infer<typeof insertUserPreferenceSchema>;
+export type UserPreference = typeof userPreferences.$inferSelect;
+
 // Events table
 export const events = pgTable("events", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: text("category").notNull(),
@@ -100,7 +88,9 @@ export type Event = typeof events.$inferSelect;
 
 // Event Attendees (join table)
 export const eventAttendees = pgTable("event_attendees", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   eventId: varchar("event_id").notNull(),
   userId: varchar("user_id").notNull(),
   userName: text("user_name").notNull(),
@@ -120,7 +110,9 @@ export type Attendee = typeof eventAttendees.$inferSelect;
 
 // Reviews
 export const reviews = pgTable("reviews", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   eventId: varchar("event_id").notNull(),
   userId: varchar("user_id").notNull(),
   userName: text("user_name").notNull(),
@@ -161,4 +153,4 @@ export interface EventFilters {
 }
 
 // Export auth models
-export * from "./models/auth";
+export * from "./models";

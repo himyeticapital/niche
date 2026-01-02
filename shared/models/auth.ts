@@ -1,6 +1,6 @@
 import { index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { z } from "zod";
-import { users } from "@shared/schema";
+import { users } from "./users";
 
 // Session storage table.
 export const sessions = pgTable(
