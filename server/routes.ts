@@ -15,6 +15,7 @@ import {
   fetchOrder,
   fetchPayment,
 } from "./razorpayClient";
+import { registerUserPreferencesRoutes } from "./routes/user_preferences_routes";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -22,7 +23,11 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Setup authentication first
   await setupAuth(app);
+
   registerAuthRoutes(app);
+
+  registerUserPreferencesRoutes(app);
+
   // Get all events with optional filters
   app.get("/api/events", async (req, res) => {
     try {
