@@ -33,7 +33,8 @@ import { Label } from "@/components/ui/label";
 import { EventCard } from "@/components/event-card";
 import { CategoryPill } from "@/components/category-pill";
 import { Skeleton } from "@/components/ui/skeleton";
-import { categories, type Event } from "@shared/schema";
+import { type Event } from "@shared/schema";
+import { categories } from "@shared/utils/constants";
 
 export default function EventsPage() {
   const [location] = useLocation();
@@ -46,7 +47,11 @@ export default function EventsPage() {
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [sortBy, setSortBy] = useState("date");
-  const [userLocation, setUserLocation] = useState({ name: "Gangtok, Sikkim", lat: 27.3314, lng: 88.6138 });
+  const [userLocation, setUserLocation] = useState({
+    name: "Gangtok, Sikkim",
+    lat: 27.3314,
+    lng: 88.6138,
+  });
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
   useEffect(() => {
@@ -60,7 +65,11 @@ export default function EventsPage() {
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
             );
             const data = await response.json();
-            const city = data.address?.city || data.address?.town || data.address?.village || "Your Location";
+            const city =
+              data.address?.city ||
+              data.address?.town ||
+              data.address?.village ||
+              "Your Location";
             const state = data.address?.state || "";
             setUserLocation({
               name: state ? `${city}, ${state}` : city,
@@ -131,7 +140,11 @@ export default function EventsPage() {
   };
 
   const hasActiveFilters =
-    searchQuery || selectedCategory || maxDistance[0] !== 5 || priceRange[0] !== 0 || priceRange[1] !== 2000;
+    searchQuery ||
+    selectedCategory ||
+    maxDistance[0] !== 5 ||
+    priceRange[0] !== 0 ||
+    priceRange[1] !== 2000;
 
   return (
     <div className="min-h-screen pb-16">
@@ -153,20 +166,30 @@ export default function EventsPage() {
             </div>
 
             {/* Location */}
-            <Button variant="outline" className="gap-2" data-testid="button-location">
+            <Button
+              variant="outline"
+              className="gap-2"
+              data-testid="button-location"
+            >
               {isDetectingLocation ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <MapPin className="h-4 w-4" />
               )}
               <span className="hidden sm:inline">{userLocation.name}</span>
-              <span className="text-muted-foreground">({maxDistance[0]}km)</span>
+              <span className="text-muted-foreground">
+                ({maxDistance[0]}km)
+              </span>
             </Button>
 
             {/* Filters Sheet */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="gap-2" data-testid="button-filters">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  data-testid="button-filters"
+                >
                   <SlidersHorizontal className="h-4 w-4" />
                   Filters
                   {hasActiveFilters && (
@@ -229,7 +252,9 @@ export default function EventsPage() {
                           selected={selectedCategory === category.id}
                           onClick={() =>
                             setSelectedCategory(
-                              selectedCategory === category.id ? "" : category.id
+                              selectedCategory === category.id
+                                ? ""
+                                : category.id
                             )
                           }
                           size="sm"
@@ -375,9 +400,7 @@ export default function EventsPage() {
           <div className="relative h-[600px] bg-muted rounded-lg flex items-center justify-center">
             <div className="text-center">
               <Map className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
-                Map view coming soon
-              </p>
+              <p className="text-muted-foreground">Map view coming soon</p>
               <p className="text-sm text-muted-foreground mt-2">
                 {filteredEvents.length} events in this area
               </p>

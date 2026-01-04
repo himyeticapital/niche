@@ -1,10 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertEventSchema, insertAttendeeSchema, insertReviewSchema } from "@shared/schema";
+import {
+  insertEventSchema,
+  insertAttendeeSchema,
+  insertReviewSchema,
+} from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
-import { getRazorpayKeyId, createOrder, verifyPaymentSignature, fetchOrder, fetchPayment } from "./razorpayClient";
+import {
+  getRazorpayKeyId,
+  createOrder,
+  verifyPaymentSignature,
+  fetchOrder,
+  fetchPayment,
+} from "./razorpayClient";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -13,15 +23,18 @@ export async function registerRoutes(
   // Setup authentication first
   await setupAuth(app);
   registerAuthRoutes(app);
-  
   // Get all events with optional filters
   app.get("/api/events", async (req, res) => {
     try {
       const filters = {
         category: req.query.category as string | undefined,
         searchQuery: req.query.q as string | undefined,
-        minPrice: req.query.minPrice ? parseInt(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseInt(req.query.maxPrice as string) : undefined,
+        minPrice: req.query.minPrice
+          ? parseInt(req.query.minPrice as string)
+          : undefined,
+        maxPrice: req.query.maxPrice
+          ? parseInt(req.query.maxPrice as string)
+          : undefined,
       };
       const events = await storage.getEvents(filters);
       res.json(events);
@@ -53,7 +66,9 @@ export async function registerRoutes(
       res.status(201).json(event);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid event data", details: error.errors });
+        return res
+          .status(400)
+          .json({ error: "Invalid event data", details: error.errors });
       }
       console.error("Error creating event:", error);
       res.status(500).json({ error: "Failed to create event" });
@@ -169,7 +184,9 @@ export async function registerRoutes(
         return res.status(400).json({ error: "User name is required" });
       }
       if (!req.body.rating || req.body.rating < 1 || req.body.rating > 5) {
-        return res.status(400).json({ error: "Rating must be between 1 and 5" });
+        return res
+          .status(400)
+          .json({ error: "Rating must be between 1 and 5" });
       }
 
       const reviewData = {
@@ -229,7 +246,7 @@ export async function registerRoutes(
 
   // Get categories
   app.get("/api/categories", async (req, res) => {
-    const { categories } = await import("@shared/schema");
+    const { categories } = await import("@shared/utils/constants");
     res.json(categories);
   });
 
@@ -240,7 +257,10 @@ export async function registerRoutes(
       res.json({ keyId });
     } catch (error) {
       console.error("Error getting Razorpay config:", error);
-      res.status(500).json({ error: "Payment system not configured. Please add Razorpay credentials." });
+      res.status(500).json({
+        error:
+          "Payment system not configured. Please add Razorpay credentials.",
+      });
     }
   });
 
@@ -264,14 +284,14 @@ export async function registerRoutes(
       // Create Razorpay order
       const order = await createOrder({
         amount: event.price ?? 0,
-        currency: 'INR',
+        currency: "INR",
         receipt: `event_${event.id}_${Date.now()}`,
         notes: {
           eventId: event.id,
           eventTitle: event.title,
           userName,
           userEmail,
-          userPhone: userPhone || '',
+          userPhone: userPhone || "",
         },
       });
 
@@ -284,7 +304,7 @@ export async function registerRoutes(
         prefill: {
           name: userName,
           email: userEmail,
-          contact: userPhone || '',
+          contact: userPhone || "",
         },
       });
     } catch (error) {
@@ -296,10 +316,19 @@ export async function registerRoutes(
   // Verify Razorpay payment and register attendee
   app.post("/api/events/:id/verify-payment", async (req, res) => {
     try {
-      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userName, userEmail, userPhone } = req.body;
-      
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        userName,
+        userEmail,
+        userPhone,
+      } = req.body;
+
       if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        return res.status(400).json({ error: "Payment verification data required" });
+        return res
+          .status(400)
+          .json({ error: "Payment verification data required" });
       }
 
       // Verify the payment signature (HMAC)
@@ -316,14 +345,16 @@ export async function registerRoutes(
       // Fetch order from Razorpay to verify it belongs to this event
       const order = await fetchOrder(razorpay_order_id);
       const orderNotes = order.notes as Record<string, string> | undefined;
-      
+
       if (!orderNotes || orderNotes.eventId !== req.params.id) {
-        return res.status(403).json({ error: "Payment order does not match this event" });
+        return res
+          .status(403)
+          .json({ error: "Payment order does not match this event" });
       }
 
       // Verify payment status
       const payment = await fetchPayment(razorpay_payment_id);
-      if (payment.status !== 'captured') {
+      if (payment.status !== "captured") {
         return res.status(400).json({ error: "Payment not captured" });
       }
 
@@ -348,8 +379,8 @@ export async function registerRoutes(
 
       // Check if already registered by payment ID (prevents replay)
       const existingAttendees = await storage.getEventAttendees(req.params.id);
-      const alreadyRegisteredByPayment = existingAttendees.some(
-        a => a.paymentStatus?.includes(razorpay_payment_id)
+      const alreadyRegisteredByPayment = existingAttendees.some((a) =>
+        a.paymentStatus?.includes(razorpay_payment_id)
       );
 
       if (alreadyRegisteredByPayment) {
@@ -358,11 +389,14 @@ export async function registerRoutes(
 
       // Also check by email
       const alreadyRegisteredByEmail = existingAttendees.some(
-        a => a.userId === serverUserEmail
+        (a) => a.userId === serverUserEmail
       );
 
       if (alreadyRegisteredByEmail) {
-        return res.json({ success: true, message: "Already registered with this email" });
+        return res.json({
+          success: true,
+          message: "Already registered with this email",
+        });
       }
 
       // Check capacity
@@ -375,7 +409,7 @@ export async function registerRoutes(
         eventId: req.params.id,
         userId: serverUserEmail,
         userName: serverUserName,
-        userPhone: orderNotes.userPhone || userPhone || '',
+        userPhone: orderNotes.userPhone || userPhone || "",
         paymentStatus: `paid:${razorpay_payment_id}:${razorpay_order_id}`,
         joinedAt: new Date().toISOString(),
       };

@@ -39,8 +39,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EventCard } from "@/components/event-card";
 import { CategoryPill } from "@/components/category-pill";
 import { StarRating } from "@/components/star-rating";
-import { AnimatedStat, AnimatedStatsContainer } from "@/components/animated-stat";
-import { categories, type Event } from "@shared/schema";
+import {
+  AnimatedStat,
+  AnimatedStatsContainer,
+} from "@/components/animated-stat";
+import { type Event } from "@shared/schema";
+import { categories } from "@shared/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 
 export default function LandingPage() {
@@ -49,36 +53,42 @@ export default function LandingPage() {
   });
 
   const galleryImages = [
-    hikingImage1, hikingImage2, 
-    communityImage1, communityImage2, 
-    monasteryImage1, monasteryImage2,
-    boardGamesImage1, boardGamesImage2,
-    cyclingImage1, cyclingImage2,
-    artImage1, artImage2
+    hikingImage1,
+    hikingImage2,
+    communityImage1,
+    communityImage2,
+    monasteryImage1,
+    monasteryImage2,
+    boardGamesImage1,
+    boardGamesImage2,
+    cyclingImage1,
+    cyclingImage2,
+    artImage1,
+    artImage2,
   ];
   const [currentIndices, setCurrentIndices] = useState([0, 3, 6]);
 
   useEffect(() => {
     const intervals = [
       setInterval(() => {
-        setCurrentIndices(prev => [
+        setCurrentIndices((prev) => [
           (prev[0] + 1) % galleryImages.length,
           prev[1],
-          prev[2]
+          prev[2],
         ]);
       }, 3500),
       setInterval(() => {
-        setCurrentIndices(prev => [
+        setCurrentIndices((prev) => [
           prev[0],
           (prev[1] + 1) % galleryImages.length,
-          prev[2]
+          prev[2],
         ]);
       }, 4500),
       setInterval(() => {
-        setCurrentIndices(prev => [
+        setCurrentIndices((prev) => [
           prev[0],
           prev[1],
-          (prev[2] + 1) % galleryImages.length
+          (prev[2] + 1) % galleryImages.length,
         ]);
       }, 5500),
     ];
@@ -187,7 +197,11 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/events">
-              <Button size="lg" className="text-base px-8" data-testid="button-discover-events">
+              <Button
+                size="lg"
+                className="text-base px-8"
+                data-testid="button-discover-events"
+              >
                 Discover Events
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -235,21 +249,29 @@ export default function LandingPage() {
               Adventure Awaits in Sikkim
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Join hiking groups exploring the stunning Himalayan trails around Gangtok
+              Join hiking groups exploring the stunning Himalayan trails around
+              Gangtok
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {galleryLabels.map((label, cardIndex) => (
-              <div key={cardIndex} className="relative aspect-[4/3] overflow-hidden rounded-md group">
+              <div
+                key={cardIndex}
+                className="relative aspect-[4/3] overflow-hidden rounded-md group"
+              >
                 {galleryImages.map((img, imgIndex) => (
                   <img
                     key={imgIndex}
                     src={img}
                     alt={`${label.title} - hiking scene`}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 group-hover:scale-105 ${
-                      currentIndices[cardIndex] === imgIndex ? "opacity-100" : "opacity-0"
+                      currentIndices[cardIndex] === imgIndex
+                        ? "opacity-100"
+                        : "opacity-0"
                     }`}
-                    style={{ transition: "opacity 1s ease-in-out, transform 0.3s ease" }}
+                    style={{
+                      transition: "opacity 1s ease-in-out, transform 0.3s ease",
+                    }}
                   />
                 ))}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -356,22 +378,22 @@ export default function LandingPage() {
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                   <span>
-                    <strong>Monetize your events</strong> - Earn 90% of event fees
-                    with instant payouts
+                    <strong>Monetize your events</strong> - Earn 90% of event
+                    fees with instant payouts
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                   <span>
-                    <strong>Auto payment collection</strong> - No more manual UPI
-                    requests or tracking
+                    <strong>Auto payment collection</strong> - No more manual
+                    UPI requests or tracking
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                   <span>
-                    <strong>Built-in marketing</strong> - Get discovered by nearby
-                    community seekers
+                    <strong>Built-in marketing</strong> - Get discovered by
+                    nearby community seekers
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -407,12 +429,16 @@ export default function LandingPage() {
               <Card className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg">Organizer Dashboard</h3>
-                  <span className="text-sm text-muted-foreground">This month</span>
+                  <span className="text-sm text-muted-foreground">
+                    This month
+                  </span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-2xl font-bold">12,500</p>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Revenue
+                    </p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-2xl font-bold">8</p>
@@ -551,12 +577,16 @@ export default function LandingPage() {
             Start Building Your Community Today
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of people who have found their tribe through
-            Garum. Your community is waiting.
+            Join thousands of people who have found their tribe through Garum.
+            Your community is waiting.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/events">
-              <Button size="lg" className="text-base px-8" data-testid="button-discover-events-cta">
+              <Button
+                size="lg"
+                className="text-base px-8"
+                data-testid="button-discover-events-cta"
+              >
                 Discover Events
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

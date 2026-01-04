@@ -42,7 +42,7 @@ import { CategoryPill } from "@/components/category-pill";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { categories } from "@shared/schema";
+import { categories } from "@shared/utils/constants";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -53,8 +53,14 @@ const eventFormSchema = z.object({
   duration: z.coerce.number().min(30, "Minimum duration is 30 minutes"),
   locationName: z.string().min(3, "Location name is required"),
   locationAddress: z.string().optional(),
-  maxCapacity: z.coerce.number().min(5, "Minimum capacity is 5").max(500, "Maximum capacity is 500"),
-  price: z.coerce.number().min(0, "Price cannot be negative").max(2000, "Maximum price is 2000"),
+  maxCapacity: z.coerce
+    .number()
+    .min(5, "Minimum capacity is 5")
+    .max(500, "Maximum capacity is 500"),
+  price: z.coerce
+    .number()
+    .min(0, "Price cannot be negative")
+    .max(2000, "Maximum price is 2000"),
   bringFriend: z.boolean().default(true),
   isRecurring: z.boolean().default(false),
   recurringType: z.string().optional(),
@@ -70,7 +76,6 @@ export default function CreateEventPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 3;
-
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -133,7 +138,7 @@ export default function CreateEventPage() {
 
   const nextStep = async () => {
     let fieldsToValidate: (keyof EventFormValues)[] = [];
-    
+
     if (step === 1) {
       fieldsToValidate = ["title", "description", "category"];
     } else if (step === 2) {
@@ -215,13 +220,25 @@ export default function CreateEventPage() {
             ))}
           </div>
           <div className="flex justify-between mt-2 text-sm">
-            <span className={step >= 1 ? "text-primary font-medium" : "text-muted-foreground"}>
+            <span
+              className={
+                step >= 1 ? "text-primary font-medium" : "text-muted-foreground"
+              }
+            >
               Basics
             </span>
-            <span className={step >= 2 ? "text-primary font-medium" : "text-muted-foreground"}>
+            <span
+              className={
+                step >= 2 ? "text-primary font-medium" : "text-muted-foreground"
+              }
+            >
               Details
             </span>
-            <span className={step >= 3 ? "text-primary font-medium" : "text-muted-foreground"}>
+            <span
+              className={
+                step >= 3 ? "text-primary font-medium" : "text-muted-foreground"
+              }
+            >
               Settings
             </span>
           </div>
@@ -296,7 +313,8 @@ export default function CreateEventPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Include agenda, requirements, and any important details
+                          Include agenda, requirements, and any important
+                          details
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -324,7 +342,11 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Date</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-date" />
+                            <Input
+                              type="date"
+                              {...field}
+                              data-testid="input-date"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -338,7 +360,11 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Start Time</FormLabel>
                           <FormControl>
-                            <Input type="time" {...field} data-testid="input-time" />
+                            <Input
+                              type="time"
+                              {...field}
+                              data-testid="input-time"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -445,13 +471,18 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Recurring Frequency</FormLabel>
                           <FormControl>
-                            <Select value={field.value} onValueChange={field.onChange}>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select frequency" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="weekly">Weekly</SelectItem>
-                                <SelectItem value="biweekly">Biweekly</SelectItem>
+                                <SelectItem value="biweekly">
+                                  Biweekly
+                                </SelectItem>
                                 <SelectItem value="monthly">Monthly</SelectItem>
                               </SelectContent>
                             </Select>
@@ -520,7 +551,9 @@ export default function CreateEventPage() {
                         <FormDescription>
                           {price === 0
                             ? "Free events have no platform fee"
-                            : `You'll receive ${Math.floor(price * 0.9)} (90%) after 10% platform fee`}
+                            : `You'll receive ${Math.floor(
+                                price * 0.9
+                              )} (90%) after 10% platform fee`}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -556,9 +589,11 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Age Requirement (optional)</FormLabel>
                           <FormControl>
-                            <Select 
-                              value={field.value || "none"} 
-                              onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                            <Select
+                              value={field.value || "none"}
+                              onValueChange={(val) =>
+                                field.onChange(val === "none" ? "" : val)
+                              }
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Any age" />
@@ -567,7 +602,9 @@ export default function CreateEventPage() {
                                 <SelectItem value="none">Any age</SelectItem>
                                 <SelectItem value="18+">18+ only</SelectItem>
                                 <SelectItem value="21+">21+ only</SelectItem>
-                                <SelectItem value="family">Family friendly</SelectItem>
+                                <SelectItem value="family">
+                                  Family friendly
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -583,18 +620,26 @@ export default function CreateEventPage() {
                         <FormItem>
                           <FormLabel>Fitness Level (optional)</FormLabel>
                           <FormControl>
-                            <Select 
-                              value={field.value || "none"} 
-                              onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                            <Select
+                              value={field.value || "none"}
+                              onValueChange={(val) =>
+                                field.onChange(val === "none" ? "" : val)
+                              }
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="All levels" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="none">All levels</SelectItem>
-                                <SelectItem value="beginner">Beginner</SelectItem>
-                                <SelectItem value="intermediate">Intermediate</SelectItem>
-                                <SelectItem value="advanced">Advanced</SelectItem>
+                                <SelectItem value="beginner">
+                                  Beginner
+                                </SelectItem>
+                                <SelectItem value="intermediate">
+                                  Intermediate
+                                </SelectItem>
+                                <SelectItem value="advanced">
+                                  Advanced
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -621,7 +666,11 @@ export default function CreateEventPage() {
               </Button>
 
               {step < totalSteps ? (
-                <Button type="button" onClick={nextStep} data-testid="button-next-step">
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  data-testid="button-next-step"
+                >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
