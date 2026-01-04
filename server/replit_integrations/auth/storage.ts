@@ -1,5 +1,5 @@
 import { users, type User } from "@shared/models/auth";
-import { type UserPreference } from "@shared/schema";
+import { type UserPreference, type UserWithPreferences } from "@shared/schema";
 import { userPreferences } from "@shared/schema";
 import { db } from "../../db";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { DEFAULT_LAT, DEFAULT_LNG } from "@shared/utils/constants";
 
 // Interface for auth storage operations
 export interface IAuthStorage {
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: string): Promise<UserWithPreferences | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(data: {
     email: string;
@@ -18,9 +18,17 @@ export interface IAuthStorage {
 }
 
 class AuthStorage implements IAuthStorage {
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+  async getUser(id: string): Promise<UserWithPreferences | undefined> {
+    const [result] = await db
+      .select()
+      .from(users)
+      .leftJoin(userPreferences, eq(users.id, userPreferences.userId))
+      .where(eq(users.id, id));
+
+    if (!result) return undefined;
+
+    const { users: user, user_preferences } = result;
+    return { ...user, userPreference: user_preferences };
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {

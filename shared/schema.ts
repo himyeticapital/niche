@@ -27,6 +27,9 @@ export const insertUserSchema = createInsertSchema(users).omit({
 });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type UserWithPreferences = User & {
+  userPreference?: UserPreference | null;
+};
 
 // User Preferences Table Schema
 export const insertUserPreferenceSchema = createInsertSchema(
