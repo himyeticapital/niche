@@ -4,6 +4,10 @@ import { authStorage } from "./storage";
 import { isAuthenticated } from "./replitAuth";
 import { loginSchema, registerSchema } from "@shared/models/auth";
 import { z } from "zod";
+import { min } from "drizzle-orm";
+import { DEFAULT_LAT, DEFAULT_LNG } from "@shared/utils/constants";
+import { db } from "server/db";
+import { User } from "@shared/schema";
 
 // Register auth-specific routes
 export function registerAuthRoutes(app: Express): void {
@@ -24,12 +28,17 @@ export function registerAuthRoutes(app: Express): void {
       // Generate username from email (before the @ symbol)
       const username = data.email.split("@")[0] + "_" + Date.now().toString(36);
 
-      // Create user
-      const user = await authStorage.createUser({
-        email: data.email,
-        password: hashedPassword,
-        name: data.name,
-        username: username,
+      const user: User = await db.transaction(async (tx) => {
+        // Create user
+        const user = await authStorage.createUser({
+          email: data.email,
+          password: hashedPassword,
+          name: data.name,
+          username: username,
+        });
+        // Create default user preference
+        await authStorage.createUserPreference(user.id);
+        return user;
       });
 
       // Regenerate session to prevent session fixation
@@ -55,7 +64,9 @@ export function registerAuthRoutes(app: Express): void {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
+        return res
+          .status(400)
+          .json({ message: "Validation error", errors: error.errors });
       }
       console.error("Registration error:", error);
       const errorMessage =
