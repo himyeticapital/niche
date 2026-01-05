@@ -12,7 +12,7 @@ import CreateEventPage from "@/pages/create-event";
 import DashboardPage from "@/pages/dashboard";
 import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
-import ProfilePage from "@/pages/profile";
+import ProfilePage from "./pages/profile/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
