@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { User } from "@shared/models/auth";
 import { apiRequest } from "@/lib/queryClient";
+import type { UserWithPreferences } from "@shared/schema";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-async function fetchUser(): Promise<User | null> {
+async function fetchUser(): Promise<UserWithPreferences | null> {
   const response = await fetch("/api/auth/user", {
     credentials: "include",
   });
@@ -21,7 +21,7 @@ async function fetchUser(): Promise<User | null> {
 export function useAuth() {
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading } = useQuery<User | null>({
+  const { data: user, isLoading } = useQuery<UserWithPreferences | null>({
     queryKey: ["/api/auth/user"],
     queryFn: fetchUser,
     retry: false,
