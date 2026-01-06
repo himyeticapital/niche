@@ -16,6 +16,7 @@ import {
   fetchPayment,
 } from "./razorpayClient";
 import { registerUserPreferencesRoutes } from "./routes/user_preferences_routes";
+import { registerUserRoutes } from "./routes/user_routes";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -25,6 +26,8 @@ export async function registerRoutes(
   await setupAuth(app);
 
   registerAuthRoutes(app);
+
+  registerUserRoutes(app);
 
   registerUserPreferencesRoutes(app);
 
