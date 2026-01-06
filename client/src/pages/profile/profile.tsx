@@ -6,23 +6,49 @@ import useUpdatePreferences, {
 import ProfileCard from "./components/ProfileCard";
 import PreferencesCard from "./components/PreferencesCard";
 import { useToast } from "@/hooks/use-toast";
+import { EditProfileDialog } from "./components/EditProfileDialog";
+import { useState } from "react";
+import useUpdateUser from "@/hooks/user/use-update-user";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const [openEditUserDialog, setOpenEditUserDialog] = useState(false);
+
   const { mutate: updatePreferences, isPending: isUpdatingPreferences } =
     useUpdatePreferences({
       onSuccess: () => {
-        console.log("Preferences updated successfully");
         toast({
           title: "Preferences Updated Successfully!",
           variant: "success",
         });
       },
       onError: (error: any) => {
-        console.error("Error updating preferences:", error);
+        toast({
+          title: "Error Updating Preferences",
+          description: "An error occurred. Please try again later.",
+          variant: "error",
+        });
       },
     });
+
+  const { mutate: updateUser, isPending: isUpdatingUser } = useUpdateUser({
+    onSuccess: () => {
+      toast({
+        title: "Profile Updated Successfully!",
+        variant: "success",
+      });
+      setOpenEditUserDialog(false);
+      window.location.reload();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error Updating Profile!",
+        description: "An error occurred. Please try again later.",
+        variant: "error",
+      });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -48,9 +74,34 @@ export default function ProfilePage() {
   const updateUserPreferences = (preferences: UserPreferences) => {
     updatePreferences(preferences);
   };
+  const updateUserProfile = (data: {
+    name: string;
+    username: string;
+    bio: string;
+    phone: string;
+  }) => {
+    updateUser(data);
+  };
+
+  const toggleDialog = () => setOpenEditUserDialog((prev) => !prev);
+
+  const initialUserEditValues = {
+    name: user?.name || "",
+    username: user?.username || "",
+    bio: user?.bio || "",
+    phone: user?.phone || "",
+  };
 
   return (
     <div className="min-h-screen pb-16">
+      {openEditUserDialog && (
+        <EditProfileDialog
+          open
+          toggleOpen={toggleDialog}
+          initialValues={initialUserEditValues}
+          onSave={updateUserProfile}
+        />
+      )}
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
           <h1 className="font-display text-3xl font-bold mb-2">My Profile</h1>
@@ -59,7 +110,11 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="flex flex-col gap-4">
-          <ProfileCard user={user} getInitials={getInitials} />
+          <ProfileCard
+            user={user}
+            getInitials={getInitials}
+            onEdit={toggleDialog}
+          />
           <PreferencesCard
             initialPreferences={user?.userPreference}
             onSave={updateUserPreferences}

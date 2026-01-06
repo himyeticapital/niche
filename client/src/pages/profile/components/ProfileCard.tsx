@@ -8,9 +8,11 @@ import { Mail, Phone, Calendar, Star, Shield, Edit } from "lucide-react";
 function ProfileCard({
   user,
   getInitials,
+  onEdit,
 }: {
   user: any;
   getInitials: () => string;
+  onEdit?: () => void;
 }) {
   return (
     <Card>
@@ -37,7 +39,12 @@ function ProfileCard({
             </div>
             <p className="text-muted-foreground">@{user?.username}</p>
           </div>
-          <Button variant="outline" size="sm" data-testid="button-edit-profile">
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid="button-edit-profile"
+            onClick={onEdit}
+          >
             <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>
