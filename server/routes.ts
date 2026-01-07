@@ -17,6 +17,7 @@ import {
 } from "./razorpayClient";
 import { registerUserPreferencesRoutes } from "./routes/user_preferences_routes";
 import { registerUserRoutes } from "./routes/user_routes";
+import { registerEventRoutes } from "./routes/event_routes";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -30,6 +31,8 @@ export async function registerRoutes(
   registerUserRoutes(app);
 
   registerUserPreferencesRoutes(app);
+
+  registerEventRoutes(app);
 
   // Get all events with optional filters
   app.get("/api/events", async (req, res) => {
