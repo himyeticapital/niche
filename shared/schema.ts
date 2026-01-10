@@ -6,6 +6,7 @@ import {
   integer,
   real,
   boolean,
+  geometry,
   timestamp,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
@@ -61,6 +62,7 @@ export const events = pgTable("events", {
   locationAddress: text("location_address"),
   latitude: real("latitude").notNull(),
   longitude: real("longitude").notNull(),
+  location: geometry("location", { type: "Point", srid: 4326 }).notNull(), // PostGIS Point
   maxCapacity: integer("max_capacity").notNull(),
   currentAttendees: integer("current_attendees").default(0),
   price: integer("price").default(0), // in INR, 0 = free
