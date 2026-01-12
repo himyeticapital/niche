@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { categories } from "@shared/utils/constants";
 import { AGE_REQUIREMENTS } from "@/utils/constants";
 import { UserPreferences } from "@/hooks/user/use-update-preferences";
+import { MdLocationOn } from "react-icons/md";
 
 const defaultPreferences: UserPreferences = {
   categoryPreference: [],
@@ -31,6 +32,7 @@ export default function PreferencesCard({
   loading: boolean;
 }) {
   const [form, setForm] = useState(initialPreferences || defaultPreferences);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialPreferences) setForm(initialPreferences);
@@ -55,6 +57,21 @@ export default function PreferencesCard({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (onSave) await onSave(form);
+  };
+
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          handleChange("lat", position.coords.latitude);
+          handleChange("lng", position.coords.longitude);
+          setLocationError(null);
+        },
+        (error) => {
+          setLocationError("Unable to retrieve your location.");
+        }
+      );
+    }
   };
 
   return (
@@ -134,6 +151,21 @@ export default function PreferencesCard({
                 }
                 step="any"
               />
+            </div>
+            <div>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-2 max-w-[10rem] flex items-center gap-2"
+                size={"sm"}
+                onClick={getLocation}
+              >
+                <MdLocationOn />
+                Get Current Location
+              </Button>
+              {locationError && (
+                <p className="text-sm text-red-600 mt-1">{locationError}</p>
+              )}
             </div>
           </div>
 
