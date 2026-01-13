@@ -9,7 +9,6 @@ export const updateUser = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-
     const updatableFields = ["name", "username", "bio", "phone"];
     const updateData: Record<string, any> = {};
     for (const field of updatableFields) {
@@ -20,6 +19,11 @@ export const updateUser = async (req: Request, res: Response) => {
       ) {
         updateData[field] = req.body[field];
       }
+    }
+
+    const photoBuffer = req.file?.buffer;
+    if (photoBuffer) {
+      updateData.avatar = photoBuffer.toString("base64");
     }
 
     if (Object.keys(updateData).length === 0) {

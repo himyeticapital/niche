@@ -12,6 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
+// Add type for photo state
+type PhotoState = {
+  file: File | null;
+  previewUrl: string | null;
+};
+
 interface EditProfileDialogProps {
   open?: boolean;
   toggleOpen: () => void;
@@ -21,13 +27,10 @@ interface EditProfileDialogProps {
     bio?: string;
     phone?: string;
   };
-  onSave: (values: {
-    name: string;
-    username: string;
-    bio: string;
-    phone: string;
-  }) => void;
+  onSave: (values: FormData) => void;
 }
+
+const FILE_SIZE_LIMIT = 1024 * 1024; // 1 MB
 
 export function EditProfileDialog({
   open = false,
@@ -43,6 +46,13 @@ export function EditProfileDialog({
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Photo upload state
+  const [photo, setPhoto] = useState<PhotoState>({
+    file: null,
+    previewUrl: null,
+  });
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -57,17 +67,69 @@ export function EditProfileDialog({
     if (!form.phone.trim()) newErrors.phone = "Phone is required.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    onSave(form);
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("username", form.username);
+    formData.append("bio", form.bio);
+    formData.append("phone", form.phone);
+    if (photo.file) {
+      formData.append("photo", photo.file);
+    }
+    console.log("🚀 ~ handleSubmit ~ form:", form);
+    console.log("🚀 ~ handleSubmit ~ formData:", formData.get("phone"));
+
+    onSave(formData);
   };
 
   return (
     <Dialog open={open} onOpenChange={toggleOpen}>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
             Update your profile information below.
           </DialogDescription>
+          {/* Photo Upload */}
+          <div>
+            <Label htmlFor="photo">Profile Photo</Label>
+            <Input
+              id="photo"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files && e.target.files[0];
+                if (file) {
+                  if (file.size > FILE_SIZE_LIMIT) {
+                    setPhotoError("File size must be less than 1 MB.");
+                    setPhoto({ file: null, previewUrl: null });
+                  } else {
+                    const previewUrl = URL.createObjectURL(file);
+                    setPhoto({ file, previewUrl });
+                    setPhotoError(null);
+                  }
+                } else {
+                  setPhoto({ file: null, previewUrl: null });
+                  setPhotoError(null);
+                }
+              }}
+            />
+            {photoError && (
+              <span className="text-red-600 text-xs">{photoError}</span>
+            )}
+            {photo.previewUrl && !photoError && (
+              <img
+                src={photo.previewUrl}
+                alt="Preview"
+                className="mt-2 rounded w-24 h-24 object-cover border"
+              />
+            )}
+          </div>
           <div>
             <Label htmlFor="name">Name *</Label>
             <Input

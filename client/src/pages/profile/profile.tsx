@@ -74,12 +74,7 @@ export default function ProfilePage() {
   const updateUserPreferences = (preferences: UserPreferences) => {
     updatePreferences(preferences);
   };
-  const updateUserProfile = (data: {
-    name: string;
-    username: string;
-    bio: string;
-    phone: string;
-  }) => {
+  const updateUserProfile = (data: FormData) => {
     updateUser(data);
   };
 
