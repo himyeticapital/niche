@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, Calendar, Star, Shield, Edit } from "lucide-react";
+import { useGetProfile } from "@/hooks/user/use-get-profile";
 
 function ProfileCard({
   user,
@@ -14,17 +15,22 @@ function ProfileCard({
   getInitials: () => string;
   onEdit?: () => void;
 }) {
+  const { data: profile } = useGetProfile();
   return (
     <Card>
       <CardHeader className="pb-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
           <Avatar className="h-20 w-20">
-            {user?.avatar && (
-              <AvatarImage src={user.avatar} alt={user.name || "User"} />
+            {profile?.data ? (
+              <AvatarImage
+                src={`data:image/*;base64,${profile.data}`}
+                alt={profile.data.name || "User"}
+              />
+            ) : (
+              <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
+                {getInitials()}
+              </AvatarFallback>
             )}
-            <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
-              {getInitials()}
-            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2 mb-1">
