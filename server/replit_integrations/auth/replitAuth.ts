@@ -3,7 +3,9 @@ import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 
 export function getSession() {
-  if (!process.env.SESSION_SECRET) {
+  const sessionSecret = process.env["SESSION_SECRET"];
+  if (!sessionSecret) {
+    console.error("Available env vars:", Object.keys(process.env).filter(k => !k.startsWith("npm_")));
     throw new Error("SESSION_SECRET environment variable is not set");
   }
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -15,7 +17,7 @@ export function getSession() {
     tableName: "sessions",
   });
   return session({
-    secret: process.env.SESSION_SECRET,
+    secret: sessionSecret,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
