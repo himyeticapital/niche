@@ -13,6 +13,11 @@ const httpServer = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Health check endpoint for Railway
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use(
   "/assets",
   express.static(path.resolve(process.cwd(), "attached_assets"))
