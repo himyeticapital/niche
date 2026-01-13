@@ -20,15 +20,28 @@ export interface IAuthStorage {
 class AuthStorage implements IAuthStorage {
   async getUser(id: string): Promise<UserWithPreferences | undefined> {
     const [result] = await db
-      .select()
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        username: users.username,
+        password: users.password,
+        phone: users.phone,
+        bio: users.bio,
+        isVerified: users.isVerified,
+        isOrganizer: users.isOrganizer,
+        eventsHosted: users.eventsHosted,
+        rating: users.rating,
+        reviewCount: users.reviewCount,
+        user_preferences: userPreferences,
+      })
       .from(users)
       .leftJoin(userPreferences, eq(users.id, userPreferences.userId))
       .where(eq(users.id, id));
 
     if (!result) return undefined;
 
-    const { users: user, user_preferences } = result;
-    return { ...user, userPreference: user_preferences };
+    return { ...result, userPreference: result.user_preferences };
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
