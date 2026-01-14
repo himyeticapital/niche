@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import LandingPage from "@/pages/landing";
-import EventsPage from "@/pages/events";
+import EventsPage from "@/pages/events/events";
 import EventDetailPage from "@/pages/event-detail";
 import CreateEventPage from "@/pages/create-event";
 import DashboardPage from "@/pages/dashboard";
