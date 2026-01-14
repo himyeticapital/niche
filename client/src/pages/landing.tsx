@@ -15,24 +15,25 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react";
-// Hiking images
-import hikingImage1 from "@assets/stock_images/people_hiking_mounta_7858dfa2.jpg";
-import hikingImage2 from "@assets/stock_images/people_hiking_mounta_b34f990b.jpg";
-// Community yoga/activities
-import communityImage1 from "@assets/stock_images/group_of_friends_com_3f5839a4.jpg";
-import communityImage2 from "@assets/stock_images/group_of_friends_com_2c7b78f3.jpg";
-// Himalayan monasteries/Sikkim
-import monasteryImage1 from "@assets/stock_images/himalayan_monastery__bf8b8093.jpg";
-import monasteryImage2 from "@assets/stock_images/himalayan_monastery__eabed9cc.jpg";
-// Board games/social gatherings
-import boardGamesImage1 from "@assets/stock_images/people_board_games_c_23537000.jpg";
-import boardGamesImage2 from "@assets/stock_images/people_board_games_c_37ac7839.jpg";
-// Cycling/biking
-import cyclingImage1 from "@assets/stock_images/people_cycling_bikin_99294cb5.jpg";
-import cyclingImage2 from "@assets/stock_images/people_cycling_bikin_33c05549.jpg";
-// Art workshops
-import artImage1 from "@assets/stock_images/art_workshop_paintin_61252cb8.jpg";
-import artImage2 from "@assets/stock_images/art_workshop_paintin_d53280fd.jpg";
+// Sikkim images from Unsplash
+const sikkimImages = {
+  // Sikkim landscapes and mountains
+  landscape1: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80", // Sikkim mountains
+  landscape2: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80", // Himalayan view
+  landscape3: "https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=800&q=80", // Gangtok view
+  landscape4: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80", // Mountain monastery
+  // Community and people
+  community1: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", // Friends gathering
+  community2: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80", // Group activity
+  // Local culture
+  culture1: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80", // Buddhist monastery
+  culture2: "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=800&q=80", // Mountain trails
+  // Adventure
+  adventure1: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80", // Hiking
+  adventure2: "https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=800&q=80", // Trekking
+  adventure3: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80", // Mountain peaks
+  adventure4: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800&q=80", // Sunrise mountains
+};
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -53,18 +54,18 @@ export default function LandingPage() {
   });
 
   const galleryImages = [
-    hikingImage1,
-    hikingImage2,
-    communityImage1,
-    communityImage2,
-    monasteryImage1,
-    monasteryImage2,
-    boardGamesImage1,
-    boardGamesImage2,
-    cyclingImage1,
-    cyclingImage2,
-    artImage1,
-    artImage2,
+    sikkimImages.landscape1,
+    sikkimImages.landscape2,
+    sikkimImages.adventure1,
+    sikkimImages.adventure2,
+    sikkimImages.culture1,
+    sikkimImages.culture2,
+    sikkimImages.community1,
+    sikkimImages.community2,
+    sikkimImages.landscape3,
+    sikkimImages.landscape4,
+    sikkimImages.adventure3,
+    sikkimImages.adventure4,
   ];
   const [currentIndices, setCurrentIndices] = useState([0, 3, 6]);
 
