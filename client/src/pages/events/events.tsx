@@ -73,7 +73,6 @@ export default function EventsPage() {
 
   const { data: recommendedEvents, isLoading: isLoadingRecommended } =
     useEventsByPreference();
-  console.log("🚀 ~ EventsPage ~ recommendedEvents:", recommendedEvents);
 
   const filteredEvents = events
     .filter((event) => {
@@ -156,15 +155,14 @@ export default function EventsPage() {
             className={
               viewMode === "list"
                 ? "space-y-4"
-                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "flex gap-4 overflow-x-auto pb-2 mb-6 custom-scrollbar scroll-smooth"
             }
           >
             {recommendedEvents.data.map((event, index) => (
               <EventCard
                 key={event.id}
                 event={event}
-                distance={1.2 + index * 0.5}
-                variant={viewMode === "list" ? "list" : "default"}
+                variant={viewMode === "list" ? "list" : "compact"}
               />
             ))}
           </div>

@@ -13,10 +13,14 @@ import type { Event } from "@shared/schema";
 interface EventCardProps {
   event: Event;
   distance?: number;
-  variant?: "default" | "featured" | "list";
+  variant?: "default" | "featured" | "list" | "compact";
 }
 
-export function EventCard({ event, distance, variant = "default" }: EventCardProps) {
+export function EventCard({
+  event,
+  distance,
+  variant = "default",
+}: EventCardProps) {
   const CategoryIcon = getCategoryIcon(event.category);
   const isFull = event.currentAttendees! >= event.maxCapacity;
   const spotsLeft = event.maxCapacity - (event.currentAttendees || 0);
@@ -73,7 +77,9 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
                   {event.price === 0 ? (
-                    <span className="text-emerald-600 dark:text-emerald-400">Free</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      Free
+                    </span>
                   ) : (
                     <span className="flex items-center">
                       <IndianRupee className="h-3 w-3" />
@@ -87,6 +93,41 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
               </div>
             </div>
           </div>
+        </Card>
+      </Link>
+    );
+  }
+
+  if (variant === "compact") {
+    return (
+      <Link href={`/events/${event.id}`}>
+        <Card
+          className="overflow-visible hover-elevate transition-transform cursor-pointer group w-48"
+          data-testid={`event-card-compact-${event.id}`}
+        >
+          <div className="relative aspect-video overflow-hidden rounded-t-lg bg-muted">
+            {event.coverImage ? (
+              <img
+                src={event.coverImage}
+                alt={event.title}
+                className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                <CategoryIcon className="h-10 w-10 text-primary/40" />
+              </div>
+            )}
+          </div>
+          <CardContent className="p-3 space-y-1">
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              <span className="line-clamp-1">{event.locationName}</span>
+            </p>
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              {formatDate(event.date)} at {event.time}
+            </span>
+          </CardContent>
         </Card>
       </Link>
     );
@@ -154,14 +195,19 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
           <div className="flex items-center gap-2">
             <Avatar className="h-7 w-7">
               {event.organizerAvatar ? (
-                <AvatarImage src={event.organizerAvatar} alt={event.organizerName} />
+                <AvatarImage
+                  src={event.organizerAvatar}
+                  alt={event.organizerName}
+                />
               ) : null}
               <AvatarFallback className="text-xs bg-primary/10 text-primary">
                 {event.organizerName.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <span className="text-sm font-medium">{event.organizerName}</span>
-            {event.organizerVerified && <VerifiedBadge className="h-3.5 w-3.5" />}
+            {event.organizerVerified && (
+              <VerifiedBadge className="h-3.5 w-3.5" />
+            )}
           </div>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -175,7 +221,9 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
             <div className="flex items-center gap-3">
               <span className="font-semibold">
                 {event.price === 0 ? (
-                  <span className="text-emerald-600 dark:text-emerald-400">Free</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    Free
+                  </span>
                 ) : (
                   <span className="flex items-center">
                     <IndianRupee className="h-4 w-4" />
@@ -190,7 +238,7 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
             </div>
             <StarRating
               rating={event.rating || 0}
-              reviewCount={event.reviewCount}
+              reviewCount={event.reviewCount || 0}
               size="sm"
             />
           </div>
@@ -201,7 +249,11 @@ export function EventCard({ event, distance, variant = "default" }: EventCardPro
             disabled={isFull}
             data-testid={`button-join-${event.id}`}
           >
-            {isFull ? "Event Full" : spotsLeft <= 5 ? `Join (${spotsLeft} spots left)` : "Join Event"}
+            {isFull
+              ? "Event Full"
+              : spotsLeft <= 5
+              ? `Join (${spotsLeft} spots left)`
+              : "Join Event"}
           </Button>
         </CardContent>
       </Card>
