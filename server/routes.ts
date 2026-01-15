@@ -34,27 +34,6 @@ export async function registerRoutes(
 
   registerEventRoutes(app);
 
-  // Get all events with optional filters
-  app.get("/api/events", async (req, res) => {
-    try {
-      const filters = {
-        category: req.query.category as string | undefined,
-        searchQuery: req.query.q as string | undefined,
-        minPrice: req.query.minPrice
-          ? parseInt(req.query.minPrice as string)
-          : undefined,
-        maxPrice: req.query.maxPrice
-          ? parseInt(req.query.maxPrice as string)
-          : undefined,
-      };
-      const events = await storage.getEvents(filters);
-      res.json(events);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      res.status(500).json({ error: "Failed to fetch events" });
-    }
-  });
-
   // Get single event by ID
   app.get("/api/events/:id", async (req, res) => {
     try {

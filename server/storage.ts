@@ -60,7 +60,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-1",
         title: "Sunrise Hiking at Tashi Viewpoint",
-        description: "Join us for a beautiful sunrise hike to Tashi Viewpoint! Experience breathtaking views of Kanchenjunga as the sun rises over the Himalayas.\n\nWhat to bring:\n- Warm layers (it gets cold!)\n- Water bottle\n- Camera for the views\n- Comfortable hiking shoes\n\nWe'll meet at MG Marg and carpool together. Hot chai and momos after the hike!",
+        description:
+          "Join us for a beautiful sunrise hike to Tashi Viewpoint! Experience breathtaking views of Kanchenjunga as the sun rises over the Himalayas.\n\nWhat to bring:\n- Warm layers (it gets cold!)\n- Water bottle\n- Camera for the views\n- Comfortable hiking shoes\n\nWe'll meet at MG Marg and carpool together. Hot chai and momos after the hike!",
         category: "hiking",
         interests: ["fitness", "outdoor", "nature"],
         coverImage: "",
@@ -71,6 +72,7 @@ export class MemStorage implements IStorage {
         locationAddress: "Tashi Viewpoint, Gangtok, Sikkim 737101",
         latitude: 27.3389,
         longitude: 88.6065,
+        location: [27.3389, 88.6065],
         maxCapacity: 15,
         currentAttendees: 12,
         price: 1000,
@@ -93,7 +95,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-17",
         title: "MG Marg Morning Run Club",
-        description: "Start your day right with the Gangtok Running Community! Join us for a refreshing morning run through the scenic streets of Gangtok.\n\nWhat to expect:\n- 5km easy-paced run suitable for all levels\n- Warm-up and cool-down stretches\n- Post-run chai at a local cafe\n- Meet fellow running enthusiasts\n\nAll fitness levels welcome. We run together, no one left behind!",
+        description:
+          "Start your day right with the Gangtok Running Community! Join us for a refreshing morning run through the scenic streets of Gangtok.\n\nWhat to expect:\n- 5km easy-paced run suitable for all levels\n- Warm-up and cool-down stretches\n- Post-run chai at a local cafe\n- Meet fellow running enthusiasts\n\nAll fitness levels welcome. We run together, no one left behind!",
         category: "running",
         interests: ["fitness", "running", "outdoor"],
         coverImage: "",
@@ -104,6 +107,7 @@ export class MemStorage implements IStorage {
         locationAddress: "MG Marg, Gangtok, Sikkim 737101",
         latitude: 27.3314,
         longitude: 88.6138,
+        location: [27.3314, 88.6138],
         maxCapacity: 20,
         currentAttendees: 14,
         price: 0,
@@ -126,7 +130,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-2",
         title: "Dog Parents Nature Walk - Hanuman Tok Trail",
-        description: "Calling all dog parents in Gangtok! Join us for a scenic walk with your furry friends along the peaceful Hanuman Tok trail.\n\nRequirements:\n- Dogs must be on leash\n- Bring water for yourself and your pet\n- Pick up after your dog\n\nThe trail is moderate and perfect for dogs of all sizes. Beautiful mountain views guaranteed!",
+        description:
+          "Calling all dog parents in Gangtok! Join us for a scenic walk with your furry friends along the peaceful Hanuman Tok trail.\n\nRequirements:\n- Dogs must be on leash\n- Bring water for yourself and your pet\n- Pick up after your dog\n\nThe trail is moderate and perfect for dogs of all sizes. Beautiful mountain views guaranteed!",
         category: "dog-parents",
         interests: ["hiking", "outdoor", "pets"],
         coverImage: "",
@@ -135,8 +140,9 @@ export class MemStorage implements IStorage {
         duration: 150,
         locationName: "Hanuman Tok Trail",
         locationAddress: "Hanuman Tok, Gangtok, Sikkim",
-        latitude: 27.3500,
-        longitude: 88.6150,
+        latitude: 27.35,
+        longitude: 88.615,
+        location: [27.35, 88.615],
         maxCapacity: 12,
         currentAttendees: 8,
         price: 1000,
@@ -159,7 +165,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-3",
         title: "Christmas Eve House Party - MG Marg",
-        description: "Celebrate Christmas Eve with the Gangtok community! Join us for a cozy house party with music, food, and good vibes.\n\nWhat to expect:\n- DJ playing everything from Nepali hits to Bollywood\n- Potluck style - bring a dish to share\n- Secret Santa (optional)\n- Stunning rooftop views of Gangtok\n\nLet's make this Christmas memorable!",
+        description:
+          "Celebrate Christmas Eve with the Gangtok community! Join us for a cozy house party with music, food, and good vibes.\n\nWhat to expect:\n- DJ playing everything from Nepali hits to Bollywood\n- Potluck style - bring a dish to share\n- Secret Santa (optional)\n- Stunning rooftop views of Gangtok\n\nLet's make this Christmas memorable!",
         category: "social",
         interests: ["social", "music", "party"],
         coverImage: "",
@@ -170,6 +177,7 @@ export class MemStorage implements IStorage {
         locationAddress: "MG Marg, Gangtok, Sikkim 737101",
         latitude: 27.3314,
         longitude: 88.6138,
+        location: [27.3314, 88.6138],
         maxCapacity: 30,
         currentAttendees: 24,
         price: 1000,
@@ -192,7 +200,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-4",
         title: "Thangka Painting Workshop for Beginners",
-        description: "Learn the ancient Tibetan Buddhist art of Thangka painting! This beginner-friendly workshop will introduce you to the basics of this sacred art form.\n\nYou'll learn:\n- History and significance of Thangka\n- Basic drawing techniques\n- Traditional color mixing\n- Meditation while painting\n\nAll materials provided. Take home your own small Thangka!",
+        description:
+          "Learn the ancient Tibetan Buddhist art of Thangka painting! This beginner-friendly workshop will introduce you to the basics of this sacred art form.\n\nYou'll learn:\n- History and significance of Thangka\n- Basic drawing techniques\n- Traditional color mixing\n- Meditation while painting\n\nAll materials provided. Take home your own small Thangka!",
         category: "art",
         interests: ["creative", "meditation", "culture"],
         coverImage: "",
@@ -202,7 +211,8 @@ export class MemStorage implements IStorage {
         locationName: "Namgyal Institute of Tibetology",
         locationAddress: "Deorali, Gangtok, Sikkim 737102",
         latitude: 27.3167,
-        longitude: 88.6000,
+        longitude: 88.6,
+        location: [27.3167, 88.6],
         maxCapacity: 10,
         currentAttendees: 7,
         price: 1000,
@@ -225,7 +235,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-5",
         title: "Early Morning Fishing at Tsomgo Lake",
-        description: "Experience the peace of fishing at the stunning Tsomgo Lake! Join fellow fishing enthusiasts for a serene morning surrounded by snow-capped peaks.\n\nEquipment provided for beginners. Experienced anglers welcome with their own gear.\n\nNote: We practice catch-and-release. Permits arranged. Dress warmly - it's cold up there!",
+        description:
+          "Experience the peace of fishing at the stunning Tsomgo Lake! Join fellow fishing enthusiasts for a serene morning surrounded by snow-capped peaks.\n\nEquipment provided for beginners. Experienced anglers welcome with their own gear.\n\nNote: We practice catch-and-release. Permits arranged. Dress warmly - it's cold up there!",
         category: "fishing",
         interests: ["outdoor", "relaxation", "nature"],
         coverImage: "",
@@ -236,6 +247,7 @@ export class MemStorage implements IStorage {
         locationAddress: "Tsomgo Lake, East Sikkim 737103",
         latitude: 27.3753,
         longitude: 88.7644,
+        location: [27.3753, 88.7644],
         maxCapacity: 8,
         currentAttendees: 5,
         price: 1200,
@@ -258,7 +270,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-6",
         title: "Saturday Night DJ Rave - Cloud Nine Rooftop",
-        description: "Get ready for Gangtok's hottest weekend party! DJ Sonam is spinning the best EDM, techno, and house music.\n\nHighlights:\n- Open-air rooftop with mountain views\n- Full bar available\n- Light show and fog machines\n- Dance till 2 AM\n\nCome dressed to impress. Let's make Saturday nights legendary!",
+        description:
+          "Get ready for Gangtok's hottest weekend party! DJ Sonam is spinning the best EDM, techno, and house music.\n\nHighlights:\n- Open-air rooftop with mountain views\n- Full bar available\n- Light show and fog machines\n- Dance till 2 AM\n\nCome dressed to impress. Let's make Saturday nights legendary!",
         category: "social",
         interests: ["music", "party", "nightlife"],
         coverImage: "",
@@ -267,8 +280,9 @@ export class MemStorage implements IStorage {
         duration: 300,
         locationName: "Cloud Nine Rooftop Cafe",
         locationAddress: "Near MG Marg, Gangtok, Sikkim",
-        latitude: 27.3320,
+        latitude: 27.332,
         longitude: 88.6145,
+        location: [27.332, 88.6145],
         maxCapacity: 50,
         currentAttendees: 38,
         price: 1000,
@@ -291,7 +305,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-7",
         title: "Tattoo Workshop - Learn Basic Techniques",
-        description: "Ever wanted to try tattooing? Join our hands-on workshop where you'll learn:\n\n- Safety and hygiene basics\n- Machine handling\n- Line work on practice skin\n- Design fundamentals\n\nNo experience needed. All equipment provided. You won't be tattooing real skin - just practice materials!\n\nPerfect for artists curious about the craft.",
+        description:
+          "Ever wanted to try tattooing? Join our hands-on workshop where you'll learn:\n\n- Safety and hygiene basics\n- Machine handling\n- Line work on practice skin\n- Design fundamentals\n\nNo experience needed. All equipment provided. You won't be tattooing real skin - just practice materials!\n\nPerfect for artists curious about the craft.",
         category: "art",
         interests: ["creative", "learning", "art"],
         coverImage: "",
@@ -302,6 +317,7 @@ export class MemStorage implements IStorage {
         locationAddress: "Tibet Road, Gangtok, Sikkim",
         latitude: 27.3289,
         longitude: 88.6123,
+        location: [27.3289, 88.6123],
         maxCapacity: 6,
         currentAttendees: 4,
         price: 1500,
@@ -324,7 +340,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-8",
         title: "Sikkim Investors Club - Monthly Meetup",
-        description: "Join Sikkim's growing community of investors! Whether you're into stocks, crypto, mutual funds, or real estate - this is your tribe.\n\nThis month's topics:\n- 2025 market outlook\n- Tax-saving investment strategies\n- Local business investment opportunities\n- Q&A session\n\nBeginner-friendly. Learn from experienced investors!",
+        description:
+          "Join Sikkim's growing community of investors! Whether you're into stocks, crypto, mutual funds, or real estate - this is your tribe.\n\nThis month's topics:\n- 2025 market outlook\n- Tax-saving investment strategies\n- Local business investment opportunities\n- Q&A session\n\nBeginner-friendly. Learn from experienced investors!",
         category: "social",
         interests: ["finance", "learning", "networking"],
         coverImage: "",
@@ -333,8 +350,9 @@ export class MemStorage implements IStorage {
         duration: 120,
         locationName: "The Coffee Shop",
         locationAddress: "MG Marg, Gangtok, Sikkim 737101",
-        latitude: 27.3310,
+        latitude: 27.331,
         longitude: 88.6135,
+        location: [27.331, 88.6135],
         maxCapacity: 20,
         currentAttendees: 14,
         price: 1000,
@@ -357,7 +375,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-9",
         title: "Gangtok Hackathon - Build for Sikkim",
-        description: "24-hour hackathon to build tech solutions for local Sikkim challenges!\n\nThemes:\n- Tourism tech\n- Local business digitization\n- Environmental monitoring\n- Healthcare accessibility\n\nPrizes worth Rs. 50,000! Food and chai provided throughout.\n\nTeams of 2-4. Solo participants will be matched with teams.",
+        description:
+          "24-hour hackathon to build tech solutions for local Sikkim challenges!\n\nThemes:\n- Tourism tech\n- Local business digitization\n- Environmental monitoring\n- Healthcare accessibility\n\nPrizes worth Rs. 50,000! Food and chai provided throughout.\n\nTeams of 2-4. Solo participants will be matched with teams.",
         category: "social",
         interests: ["tech", "coding", "innovation"],
         coverImage: "",
@@ -366,8 +385,9 @@ export class MemStorage implements IStorage {
         duration: 1440,
         locationName: "Sikkim Manipal University",
         locationAddress: "5th Mile, Tadong, Gangtok, Sikkim",
-        latitude: 27.2950,
-        longitude: 88.6050,
+        latitude: 27.295,
+        longitude: 88.605,
+        location: [27.295, 88.605],
         maxCapacity: 40,
         currentAttendees: 28,
         price: 1000,
@@ -390,7 +410,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-10",
         title: "New Year's Eve House Party Bash",
-        description: "Ring in 2026 with the biggest house party in Gangtok! Celebrate with friends old and new.\n\nWhat's happening:\n- Live DJ from 10 PM\n- Bonfire on the terrace\n- Midnight fireworks view\n- Unlimited drinks package\n- Momos and local food\n\nDress code: Festive! Let's welcome 2026 in style!",
+        description:
+          "Ring in 2026 with the biggest house party in Gangtok! Celebrate with friends old and new.\n\nWhat's happening:\n- Live DJ from 10 PM\n- Bonfire on the terrace\n- Midnight fireworks view\n- Unlimited drinks package\n- Momos and local food\n\nDress code: Festive! Let's welcome 2026 in style!",
         category: "social",
         interests: ["party", "social", "celebration"],
         coverImage: "",
@@ -399,8 +420,9 @@ export class MemStorage implements IStorage {
         duration: 360,
         locationName: "Mountain View Villa",
         locationAddress: "Upper Tadong, Gangtok, Sikkim",
-        latitude: 27.3050,
-        longitude: 88.6100,
+        latitude: 27.305,
+        longitude: 88.61,
+        location: [27.305, 88.61],
         maxCapacity: 60,
         currentAttendees: 45,
         price: 1200,
@@ -423,7 +445,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-11",
         title: "BGMI Tournament - Gangtok Esports League",
-        description: "Calling all BGMI players! Join Gangtok's biggest mobile gaming tournament with cash prizes!\n\nFormat:\n- Squad mode (4 players per team)\n- 3 matches, points system\n- Top 3 teams win cash prizes\n- Total prize pool: Rs. 15,000\n\nRequirements:\n- Bring your own device\n- Stable internet (WiFi provided as backup)\n- Register with your in-game name\n\nLet's find out who's the best squad in Sikkim!",
+        description:
+          "Calling all BGMI players! Join Gangtok's biggest mobile gaming tournament with cash prizes!\n\nFormat:\n- Squad mode (4 players per team)\n- 3 matches, points system\n- Top 3 teams win cash prizes\n- Total prize pool: Rs. 15,000\n\nRequirements:\n- Bring your own device\n- Stable internet (WiFi provided as backup)\n- Register with your in-game name\n\nLet's find out who's the best squad in Sikkim!",
         category: "gaming",
         interests: ["gaming", "esports", "competition"],
         coverImage: "",
@@ -433,7 +456,8 @@ export class MemStorage implements IStorage {
         locationName: "Game Zone Cafe",
         locationAddress: "Tibet Road, Gangtok, Sikkim",
         latitude: 27.3295,
-        longitude: 88.6130,
+        longitude: 88.613,
+        location: [27.3295, 88.613],
         maxCapacity: 40,
         currentAttendees: 32,
         price: 1000,
@@ -456,7 +480,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-12",
         title: "PC Gaming LAN Party - Valorant & CS2",
-        description: "Old school LAN party vibes are back! Join fellow gamers for an epic night of Valorant and CS2.\n\nWhat we're playing:\n- Valorant custom matches\n- CS2 competitive\n- Casual games between rounds\n\nSetup:\n- 20 gaming PCs available\n- Bring your own peripherals if preferred\n- High-speed internet\n- Snacks and energy drinks included\n\nBeginner-friendly! We'll help you get started.",
+        description:
+          "Old school LAN party vibes are back! Join fellow gamers for an epic night of Valorant and CS2.\n\nWhat we're playing:\n- Valorant custom matches\n- CS2 competitive\n- Casual games between rounds\n\nSetup:\n- 20 gaming PCs available\n- Bring your own peripherals if preferred\n- High-speed internet\n- Snacks and energy drinks included\n\nBeginner-friendly! We'll help you get started.",
         category: "gaming",
         interests: ["gaming", "social", "PC gaming"],
         coverImage: "",
@@ -465,8 +490,9 @@ export class MemStorage implements IStorage {
         duration: 300,
         locationName: "Pixel Arena Gaming Lounge",
         locationAddress: "Development Area, Gangtok, Sikkim",
-        latitude: 27.3400,
-        longitude: 88.6080,
+        latitude: 27.34,
+        longitude: 88.608,
+        location: [27.34, 88.608],
         maxCapacity: 20,
         currentAttendees: 16,
         price: 1000,
@@ -489,7 +515,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-13",
         title: "Board Games & Chai Night",
-        description: "Tired of screens? Join us for an evening of classic and modern board games!\n\nGames available:\n- Catan, Ticket to Ride, Codenames\n- Chess, Carrom, Ludo\n- Werewolf for larger groups\n- Bring your favorites too!\n\nPerfect for:\n- Making new friends\n- Date nights\n- Family-friendly fun\n\nUnlimited chai and light snacks included!",
+        description:
+          "Tired of screens? Join us for an evening of classic and modern board games!\n\nGames available:\n- Catan, Ticket to Ride, Codenames\n- Chess, Carrom, Ludo\n- Werewolf for larger groups\n- Bring your favorites too!\n\nPerfect for:\n- Making new friends\n- Date nights\n- Family-friendly fun\n\nUnlimited chai and light snacks included!",
         category: "gaming",
         interests: ["board games", "social", "strategy"],
         coverImage: "",
@@ -499,7 +526,8 @@ export class MemStorage implements IStorage {
         locationName: "Himalayan Board Game Club",
         locationAddress: "MG Marg, Gangtok, Sikkim 737101",
         latitude: 27.3312,
-        longitude: 88.6140,
+        longitude: 88.614,
+        location: [27.3312, 88.614],
         maxCapacity: 24,
         currentAttendees: 18,
         price: 1000,
@@ -522,7 +550,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-14",
         title: "Anime Watch Party - One Piece Marathon",
-        description: "Nakama assemble! Join the Gangtok Anime Club for a One Piece marathon on the big screen!\n\nWhat's happening:\n- Watching Wano arc highlights\n- Big projector screen experience\n- Japanese snacks available\n- Cosplay welcome (bonus points!)\n- Discussion and theories session\n\nWhether you're caught up or a new fan, everyone's welcome!",
+        description:
+          "Nakama assemble! Join the Gangtok Anime Club for a One Piece marathon on the big screen!\n\nWhat's happening:\n- Watching Wano arc highlights\n- Big projector screen experience\n- Japanese snacks available\n- Cosplay welcome (bonus points!)\n- Discussion and theories session\n\nWhether you're caught up or a new fan, everyone's welcome!",
         category: "gaming",
         interests: ["anime", "social", "entertainment"],
         coverImage: "",
@@ -531,8 +560,9 @@ export class MemStorage implements IStorage {
         duration: 240,
         locationName: "Otaku Den",
         locationAddress: "Near Lal Bazaar, Gangtok, Sikkim",
-        latitude: 27.3280,
+        latitude: 27.328,
         longitude: 88.6155,
+        location: [27.328, 88.6155],
         maxCapacity: 30,
         currentAttendees: 22,
         price: 1000,
@@ -555,7 +585,8 @@ export class MemStorage implements IStorage {
       {
         id: "evt-15",
         title: "FIFA Tournament - Console Gaming Night",
-        description: "Think you're the best FIFA player in Gangtok? Prove it!\n\nTournament details:\n- FIFA 24 on PS5\n- 1v1 knockout format\n- Winner takes Rs. 5000\n- Runner-up gets Rs. 2000\n\nRules:\n- 6-minute halves\n- Any team allowed\n- Fair play expected\n\nCasual matches available for non-participants. Come watch the action!",
+        description:
+          "Think you're the best FIFA player in Gangtok? Prove it!\n\nTournament details:\n- FIFA 24 on PS5\n- 1v1 knockout format\n- Winner takes Rs. 5000\n- Runner-up gets Rs. 2000\n\nRules:\n- 6-minute halves\n- Any team allowed\n- Fair play expected\n\nCasual matches available for non-participants. Come watch the action!",
         category: "gaming",
         interests: ["gaming", "sports", "competition"],
         coverImage: "",
@@ -564,8 +595,9 @@ export class MemStorage implements IStorage {
         duration: 240,
         locationName: "Console Corner",
         locationAddress: "Nam Nang, Gangtok, Sikkim",
-        latitude: 27.3350,
-        longitude: 88.6170,
+        latitude: 27.335,
+        longitude: 88.617,
+        location: [27.335, 88.617],
         maxCapacity: 32,
         currentAttendees: 24,
         price: 1000,
@@ -595,9 +627,11 @@ export class MemStorage implements IStorage {
         userName: "Karma Diki",
         userAvatar: "",
         rating: 5,
-        comment: "The sunrise view was absolutely magical! Tenzin is a wonderful guide. Made new hiking friends!",
+        comment:
+          "The sunrise view was absolutely magical! Tenzin is a wonderful guide. Made new hiking friends!",
         createdAt: "2025-12-20T10:00:00Z",
-        organizerReply: "Thank you Karma! The Kanchenjunga views never disappoint. See you next week!",
+        organizerReply:
+          "Thank you Karma! The Kanchenjunga views never disappoint. See you next week!",
       },
       {
         id: "rev-2",
@@ -606,7 +640,8 @@ export class MemStorage implements IStorage {
         userName: "Dorje Wangmo",
         userAvatar: "",
         rating: 5,
-        comment: "Perfect morning activity. The hot momos after the hike were a bonus!",
+        comment:
+          "Perfect morning activity. The hot momos after the hike were a bonus!",
         createdAt: "2025-12-18T09:00:00Z",
         organizerReply: null,
       },
@@ -617,7 +652,8 @@ export class MemStorage implements IStorage {
         userName: "Passang Sherpa",
         userAvatar: "",
         rating: 5,
-        comment: "Dawa is an incredible teacher! I never thought I could create something so beautiful. Highly recommend!",
+        comment:
+          "Dawa is an incredible teacher! I never thought I could create something so beautiful. Highly recommend!",
         createdAt: "2025-12-15T22:00:00Z",
         organizerReply: null,
       },
@@ -771,10 +807,10 @@ export class MemStorage implements IStorage {
     const organizerEventIds = Array.from(this.events.values())
       .filter((e) => e.organizerId === organizerId)
       .map((e) => e.id);
-    
+
     // Get all attendees for those events
-    return Array.from(this.attendees.values()).filter(
-      (a) => organizerEventIds.includes(a.eventId)
+    return Array.from(this.attendees.values()).filter((a) =>
+      organizerEventIds.includes(a.eventId)
     );
   }
 
@@ -869,7 +905,8 @@ export class MemStorage implements IStorage {
 
     const avgRating =
       myEvents.length > 0
-        ? myEvents.reduce((sum, e) => sum + (e.rating || 0), 0) / myEvents.length
+        ? myEvents.reduce((sum, e) => sum + (e.rating || 0), 0) /
+          myEvents.length
         : 0;
 
     const upcomingEvents = myEvents
