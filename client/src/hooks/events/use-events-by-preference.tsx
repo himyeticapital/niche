@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { type Event } from "@shared/schema";
-interface EventsByPreferenceResponse {
+export interface EventsByPreferenceResponse {
   success: boolean;
   data: Event[];
   count: number;

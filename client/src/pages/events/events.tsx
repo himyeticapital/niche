@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { Card } from "@/components/ui/card";
 import { EventCard } from "@/components/event-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EventFilters } from "./components/EventFilters";
+import useEventsByPreference, {
+  EventsByPreferenceResponse,
+} from "@/hooks/events/use-events-by-preference";
 import { type Event } from "@shared/schema";
-import { categories } from "@shared/utils/constants";
-import useEventsByPreference from "@/hooks/events/use-events-by-preference";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { EventFilters } from "./components/EventFilters";
 import { EventSkeletonGrid } from "./components/EventSkeletonGrid";
 
 export default function EventsPage() {
@@ -143,58 +143,20 @@ export default function EventsPage() {
         clearFilters={clearFilters}
         hasActiveFilters={hasActiveFilters}
       />
-
-      {/* Results */}
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <h2 className="text-2xl font-bold mb-4 tracking-tight text-white">
-          Recommended Events
-        </h2>
         {/* Recommended Events */}
         {recommendedEvents && recommendedEvents.data.length > 0 && (
-          <div
-            className={
-              viewMode === "list"
-                ? "space-y-4"
-                : "flex gap-4 overflow-x-auto pb-2 mb-6 custom-scrollbar scroll-smooth"
-            }
-          >
-            {recommendedEvents.data.map((event, index) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                variant={viewMode === "list" ? "list" : "compact"}
-              />
-            ))}
-          </div>
+          <RecommendedEvents
+            viewMode={viewMode}
+            recommendedEvents={recommendedEvents}
+          />
         )}
-
-        {/* Results Count */}
-        <div className="flex items-center justify-between my-6">
-          <p className="text-muted-foreground">
-            {isLoading ? (
-              <Skeleton className="h-5 w-32" />
-            ) : (
-              `${filteredEvents.length} events found`
-            )}
-          </p>
-        </div>
 
         {/* Events Grid/List */}
         {isLoading ? (
           <EventSkeletonGrid viewMode={viewMode} count={6} />
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              {/* No events icon */}
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No events found</h3>
-            <p className="text-muted-foreground mb-4">
-              Try adjusting your filters or search query
-            </p>
-            <button className="btn btn-outline" onClick={clearFilters}>
-              Clear Filters
-            </button>
-          </div>
+          <NoEvents clearFilters={clearFilters} />
         ) : viewMode === "map" ? (
           <div className="relative h-[600px] bg-muted rounded-lg flex items-center justify-center">
             <div className="text-center">
@@ -206,24 +168,106 @@ export default function EventsPage() {
             </div>
           </div>
         ) : (
-          <div
-            className={
-              viewMode === "list"
-                ? "space-y-4"
-                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            }
-          >
-            {filteredEvents.map((event, index) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                distance={1.2 + index * 0.5}
-                variant={viewMode === "list" ? "list" : "default"}
-              />
-            ))}
-          </div>
+          <FilteredEvents
+            viewMode={viewMode}
+            filteredEvents={filteredEvents}
+            isLoading={isLoading}
+          />
         )}
       </div>
     </div>
   );
 }
+
+const FilteredEvents = ({
+  viewMode,
+  filteredEvents,
+  isLoading = false,
+}: {
+  isLoading: boolean;
+  viewMode: string;
+  filteredEvents: Event[];
+}) => {
+  return (
+    <div>
+      <h2 className="text-2xl font-bold tracking-tight text-white">
+        Recommended Events
+      </h2>
+      {/* Results Count */}
+      <div className="flex items-center justify-between my-6">
+        <p className="text-muted-foreground">
+          {isLoading ? (
+            <Skeleton className="h-5 w-32" />
+          ) : (
+            `${filteredEvents.length} events found`
+          )}
+        </p>
+      </div>
+
+      <div
+        className={
+          viewMode === "list"
+            ? "space-y-4"
+            : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        }
+      >
+        {filteredEvents.map((event, index) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            distance={1.2 + index * 0.5}
+            variant={viewMode === "list" ? "list" : "default"}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const RecommendedEvents = ({
+  viewMode,
+  recommendedEvents,
+}: {
+  viewMode: string;
+  recommendedEvents: EventsByPreferenceResponse;
+}) => {
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4 tracking-tight text-white">
+        Recommended Events
+      </h2>
+      <div
+        className={
+          viewMode === "list"
+            ? "space-y-4"
+            : "flex gap-4 overflow-x-auto pb-2 mb-6 custom-scrollbar scroll-smooth"
+        }
+      >
+        {recommendedEvents.data.map((event, index) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            variant={viewMode === "list" ? "list" : "compact"}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const NoEvents = ({ clearFilters }: { clearFilters: () => void }) => {
+  return (
+    <div className="text-center py-16">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+        {/* No events icon */}
+      </div>
+      <h3 className="text-lg font-semibold mb-2">No events found</h3>
+      <p className="text-muted-foreground mb-4">
+        Try adjusting your filters or search query
+      </p>
+      <button className="btn btn-outline" onClick={clearFilters}>
+        Clear Filters
+      </button>
+    </div>
+  );
+};
