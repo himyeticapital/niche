@@ -9,12 +9,26 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { EventFilters } from "./components/EventFilters";
 import { EventSkeletonGrid } from "./components/EventSkeletonGrid";
+import useGetEvents from "@/hooks/events/use-get-events";
+import usePagination from "@/hooks/common/usePagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function EventsPage() {
   const [location] = useLocation();
   const searchParams = new URLSearchParams(location.split("?")[1] || "");
   const initialCategory = searchParams.get("category") || "";
-
+  const [paginationState, setPaginationState] = useState({
+    limit: 10,
+    offset: 0,
+  });
+  console.log("🚀 ~ EventsPage ~ paginationState:", paginationState);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [maxDistance, setMaxDistance] = useState([5]);
@@ -67,47 +81,48 @@ export default function EventsPage() {
     }
   }, []);
 
-  const { data: events = [], isLoading } = useQuery<Event[]>({
-    queryKey: ["/api/events"],
+  const { data: eventsData, isLoading } = useGetEvents({
+    limit: paginationState.limit,
+    offset: paginationState.offset,
   });
 
   const { data: recommendedEvents, isLoading: isLoadingRecommended } =
     useEventsByPreference();
 
-  const filteredEvents = events
-    .filter((event) => {
-      if (selectedCategory && event.category !== selectedCategory) return false;
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        if (
-          !event.title.toLowerCase().includes(query) &&
-          !event.description.toLowerCase().includes(query) &&
-          !event.locationName.toLowerCase().includes(query)
-        ) {
-          return false;
-        }
-      }
-      if (event.price! < priceRange[0] || event.price! > priceRange[1]) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "date":
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case "price-low":
-          return (a.price || 0) - (b.price || 0);
-        case "price-high":
-          return (b.price || 0) - (a.price || 0);
-        case "rating":
-          return (b.rating || 0) - (a.rating || 0);
-        case "distance":
-          return Math.random() - 0.5;
-        default:
-          return 0;
-      }
-    });
+  // const filteredEvents = events
+  //   .filter((event) => {
+  //     if (selectedCategory && event.category !== selectedCategory) return false;
+  //     if (searchQuery) {
+  //       const query = searchQuery.toLowerCase();
+  //       if (
+  //         !event.title.toLowerCase().includes(query) &&
+  //         !event.description.toLowerCase().includes(query) &&
+  //         !event.locationName.toLowerCase().includes(query)
+  //       ) {
+  //         return false;
+  //       }
+  //     }
+  //     if (event.price! < priceRange[0] || event.price! > priceRange[1]) {
+  //       return false;
+  //     }
+  //     return true;
+  //   })
+  //   .sort((a, b) => {
+  //     switch (sortBy) {
+  //       case "date":
+  //         return new Date(a.date).getTime() - new Date(b.date).getTime();
+  //       case "price-low":
+  //         return (a.price || 0) - (b.price || 0);
+  //       case "price-high":
+  //         return (b.price || 0) - (a.price || 0);
+  //       case "rating":
+  //         return (b.rating || 0) - (a.rating || 0);
+  //       case "distance":
+  //         return Math.random() - 0.5;
+  //       default:
+  //         return 0;
+  //     }
+  //   });
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -122,6 +137,26 @@ export default function EventsPage() {
     maxDistance[0] !== 5 ||
     priceRange[0] !== 0 ||
     priceRange[1] !== 2000;
+
+  function handleNextPage() {
+    setPaginationState((prev) => ({
+      ...prev,
+      offset: prev.offset + prev.limit,
+    }));
+  }
+
+  function handlePrevPage() {
+    setPaginationState((prev) => ({
+      ...prev,
+      offset: prev.offset - prev.limit,
+    }));
+  }
+
+  const isNextActive =
+    paginationState.offset + paginationState.limit >=
+    (eventsData?.totalRows || 0);
+  const isPrevActive = paginationState.offset === 0;
+  console.log("🚀 ~ EventsPage ~ disablePrevPage:", isPrevActive);
 
   return (
     <div className="min-h-screen pb-16">
@@ -155,7 +190,7 @@ export default function EventsPage() {
         {/* Events Grid/List */}
         {isLoading ? (
           <EventSkeletonGrid viewMode={viewMode} count={6} />
-        ) : filteredEvents.length === 0 ? (
+        ) : eventsData?.data.length === 0 ? (
           <NoEvents clearFilters={clearFilters} />
         ) : viewMode === "map" ? (
           <div className="relative h-[600px] bg-muted rounded-lg flex items-center justify-center">
@@ -163,15 +198,19 @@ export default function EventsPage() {
               {/* Map view coming soon icon */}
               <p className="text-muted-foreground">Map view coming soon</p>
               <p className="text-sm text-muted-foreground mt-2">
-                {filteredEvents.length} events in this area
+                {eventsData?.data.length} events in this area
               </p>
             </div>
           </div>
         ) : (
           <FilteredEvents
             viewMode={viewMode}
-            filteredEvents={filteredEvents}
+            filteredEvents={eventsData?.data || []}
             isLoading={isLoading}
+            onNextPage={handleNextPage}
+            onPrevPage={handlePrevPage}
+            isPrevActive={isPrevActive}
+            isNextActive={isNextActive}
           />
         )}
       </div>
@@ -183,16 +222,44 @@ const FilteredEvents = ({
   viewMode,
   filteredEvents,
   isLoading = false,
+  onNextPage,
+  onPrevPage,
+  isNextActive = true,
+  isPrevActive = true,
 }: {
   isLoading: boolean;
   viewMode: string;
   filteredEvents: Event[];
+  currentPage?: number;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  isNextActive: boolean;
+  isPrevActive: boolean;
 }) => {
+  console.log("🚀 ~ FilteredEvents ~ isNextDisabled:", isNextActive);
+  console.log("🚀 ~ FilteredEvents ~ isPrevDisabled:", isPrevActive);
   return (
     <div>
-      <h2 className="text-2xl font-bold tracking-tight text-white">
-        Recommended Events
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold tracking-tight text-white">
+          Recommended Events
+        </h2>
+        <Pagination className="flex justify-center" unstyled>
+          <PaginationContent>
+            {/* Prev */}
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={onPrevPage}
+                isActive={isPrevActive}
+              />
+            </PaginationItem>
+            {/* Next */}
+            <PaginationItem>
+              <PaginationNext onClick={onNextPage} isActive={isNextActive} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
       {/* Results Count */}
       <div className="flex items-center justify-between my-6">
         <p className="text-muted-foreground">
