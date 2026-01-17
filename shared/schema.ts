@@ -31,7 +31,7 @@ export const updateUserSchema = insertUserSchema.omit({ password: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type User = typeof users.$inferSelect;
-export type UserWithPreferences = Omit<User, "avatar"> & {
+export type UserWithPreferences = User & {
   userPreference?: UserPreference | null;
 };
 

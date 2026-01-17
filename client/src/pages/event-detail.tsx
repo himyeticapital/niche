@@ -40,7 +40,6 @@ import {
 import type { Event, Review } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 
-
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
@@ -107,7 +106,9 @@ export default function EventDetailPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/events", id, "reviews"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", id, "reviews"],
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/events", id] });
       setReviewForm({ rating: 0, comment: "" });
       setShowReviewForm(false);
@@ -218,7 +219,11 @@ export default function EventDetailPage() {
       <div className="mx-auto max-w-5xl px-4 py-8">
         {/* Back Button */}
         <Link href="/events">
-          <Button variant="ghost" className="mb-6 -ml-2" data-testid="button-back">
+          <Button
+            variant="ghost"
+            className="mb-6 -ml-2"
+            data-testid="button-back"
+          >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Back to Events
           </Button>
@@ -239,7 +244,10 @@ export default function EventDetailPage() {
           )}
 
           <div className="absolute top-4 left-4 flex gap-2">
-            <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+            <Badge
+              variant="secondary"
+              className="bg-background/80 backdrop-blur-sm"
+            >
               <CategoryIcon className="h-3 w-3 mr-1" />
               {event.category}
             </Badge>
@@ -249,10 +257,18 @@ export default function EventDetailPage() {
           </div>
 
           <div className="absolute top-4 right-4 flex gap-2">
-            <Button size="icon" variant="secondary" className="bg-background/80 backdrop-blur-sm">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="bg-background/80 backdrop-blur-sm"
+            >
               <Heart className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="secondary" className="bg-background/80 backdrop-blur-sm">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="bg-background/80 backdrop-blur-sm"
+            >
               <Share2 className="h-4 w-4" />
             </Button>
           </div>
@@ -269,7 +285,7 @@ export default function EventDetailPage() {
               <div className="flex flex-wrap items-center gap-4">
                 <StarRating
                   rating={event.rating || 0}
-                  reviewCount={event.reviewCount}
+                  reviewCount={event?.reviewCount || 0}
                   size="lg"
                 />
                 <span className="text-muted-foreground flex items-center gap-1">
@@ -302,8 +318,10 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <p className="font-semibold">{event.locationName}</p>
-                    <p className="text-muted-foreground">{event.locationAddress}</p>
-                    <Button variant="link" className="p-0 h-auto text-primary">
+                    <p className="text-muted-foreground">
+                      {event.locationAddress}
+                    </p>
+                    <Button className="p-0 h-auto text-primary">
                       View on Map
                     </Button>
                   </div>
@@ -349,7 +367,8 @@ export default function EventDetailPage() {
                       Bring a Friend Recommended
                     </p>
                     <p className="text-sm text-emerald-600/80 dark:text-emerald-400/80">
-                      First time attending? Consider bringing a friend for comfort.
+                      First time attending? Consider bringing a friend for
+                      comfort.
                     </p>
                   </div>
                 </CardContent>
@@ -376,23 +395,30 @@ export default function EventDetailPage() {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-lg">{event.organizerName}</p>
+                      <p className="font-semibold text-lg">
+                        {event.organizerName}
+                      </p>
                       {event.organizerVerified && <VerifiedBadge />}
                     </div>
                     <StarRating
                       rating={event.organizerRating || 0}
-                      reviewCount={event.organizerReviewCount}
+                      reviewCount={event?.organizerReviewCount || 0}
                       size="sm"
                     />
                   </div>
-                  <Button variant="outline" data-testid="button-message-organizer">
+                  <Button
+                    variant="outline"
+                    data-testid="button-message-organizer"
+                  >
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Message
                   </Button>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {event.organizerVerified && <TrustBadge type="verified" size="sm" />}
+                  {event.organizerVerified && (
+                    <TrustBadge type="verified" size="sm" />
+                  )}
                   <TrustBadge type="responsive" size="sm" />
                 </div>
               </CardContent>
@@ -418,24 +444,36 @@ export default function EventDetailPage() {
                 <Card className="mb-4">
                   <CardContent className="p-4 space-y-4">
                     <div>
-                      <Label className="text-sm font-medium mb-2 block">Your Rating</Label>
+                      <Label className="text-sm font-medium mb-2 block">
+                        Your Rating
+                      </Label>
                       <StarRating
                         rating={reviewForm.rating}
                         showCount={false}
                         size="lg"
                         interactive
-                        onRatingChange={(rating) => setReviewForm({ ...reviewForm, rating })}
+                        onRatingChange={(rating) =>
+                          setReviewForm({ ...reviewForm, rating })
+                        }
                       />
                     </div>
                     <div>
-                      <Label htmlFor="review-comment" className="text-sm font-medium mb-2 block">
+                      <Label
+                        htmlFor="review-comment"
+                        className="text-sm font-medium mb-2 block"
+                      >
                         Your Review (optional)
                       </Label>
                       <Textarea
                         id="review-comment"
                         placeholder="Share your experience at this event..."
                         value={reviewForm.comment}
-                        onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                        onChange={(e) =>
+                          setReviewForm({
+                            ...reviewForm,
+                            comment: e.target.value,
+                          })
+                        }
                         rows={4}
                         data-testid="textarea-review-comment"
                       />
@@ -453,7 +491,9 @@ export default function EventDetailPage() {
                       </Button>
                       <Button
                         onClick={handleReviewSubmit}
-                        disabled={reviewMutation.isPending || reviewForm.rating === 0}
+                        disabled={
+                          reviewMutation.isPending || reviewForm.rating === 0
+                        }
                         data-testid="button-submit-review"
                       >
                         {reviewMutation.isPending ? (
@@ -481,7 +521,10 @@ export default function EventDetailPage() {
               ) : reviews.length > 0 ? (
                 <div className="space-y-4">
                   {reviews.map((review) => (
-                    <Card key={review.id} data-testid={`review-card-${review.id}`}>
+                    <Card
+                      key={review.id}
+                      data-testid={`review-card-${review.id}`}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <Avatar className="h-10 w-10">
@@ -499,7 +542,9 @@ export default function EventDetailPage() {
                             <div className="flex items-center justify-between">
                               <p className="font-semibold">{review.userName}</p>
                               <span className="text-sm text-muted-foreground">
-                                {new Date(review.createdAt).toLocaleDateString()}
+                                {new Date(
+                                  review.createdAt
+                                ).toLocaleDateString()}
                               </span>
                             </div>
                             <StarRating
@@ -552,7 +597,9 @@ export default function EventDetailPage() {
 
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Spots remaining</span>
+                      <span className="text-muted-foreground">
+                        Spots remaining
+                      </span>
                       <span className="font-medium">
                         {spotsLeft}/{event.maxCapacity}
                       </span>
@@ -561,7 +608,9 @@ export default function EventDetailPage() {
                       <div
                         className="h-full bg-primary rounded-full transition-all"
                         style={{
-                          width: `${(event.currentAttendees! / event.maxCapacity) * 100}%`,
+                          width: `${
+                            (event.currentAttendees! / event.maxCapacity) * 100
+                          }%`,
                         }}
                       />
                     </div>
@@ -621,7 +670,10 @@ export default function EventDetailPage() {
                 placeholder="Enter your name"
                 value={paymentForm.userName}
                 onChange={(e) =>
-                  setPaymentForm((prev) => ({ ...prev, userName: e.target.value }))
+                  setPaymentForm((prev) => ({
+                    ...prev,
+                    userName: e.target.value,
+                  }))
                 }
                 data-testid="input-user-name"
               />
@@ -635,7 +687,10 @@ export default function EventDetailPage() {
                 placeholder="+91 98765 43210"
                 value={paymentForm.userPhone}
                 onChange={(e) =>
-                  setPaymentForm((prev) => ({ ...prev, userPhone: e.target.value }))
+                  setPaymentForm((prev) => ({
+                    ...prev,
+                    userPhone: e.target.value,
+                  }))
                 }
                 data-testid="input-user-phone"
               />

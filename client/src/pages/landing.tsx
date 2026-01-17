@@ -1,26 +1,26 @@
-import { useState, useEffect } from "react";
-import { Link } from "wouter";
 import {
-  MapPin,
-  Users,
-  Star,
-  Search,
-  UserPlus,
-  Heart,
-  Shield,
-  CheckCircle2,
   AlertTriangle,
-  Eye,
-  IndianRupee,
   ArrowRight,
+  CheckCircle2,
   ChevronRight,
+  Eye,
+  Heart,
+  IndianRupee,
+  MapPin,
+  Search,
+  Shield,
+  Star,
+  UserPlus,
+  Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "wouter";
 // Hiking images
 import hikingImage1 from "@assets/stock_images/people_hiking_mounta_7858dfa2.jpg";
 import hikingImage2 from "@assets/stock_images/people_hiking_mounta_b34f990b.jpg";
 // Community yoga/activities
-import communityImage1 from "@assets/stock_images/group_of_friends_com_3f5839a4.jpg";
 import communityImage2 from "@assets/stock_images/group_of_friends_com_2c7b78f3.jpg";
+import communityImage1 from "@assets/stock_images/group_of_friends_com_3f5839a4.jpg";
 // Himalayan monasteries/Sikkim
 import monasteryImage1 from "@assets/stock_images/himalayan_monastery__bf8b8093.jpg";
 import monasteryImage2 from "@assets/stock_images/himalayan_monastery__eabed9cc.jpg";
@@ -28,28 +28,28 @@ import monasteryImage2 from "@assets/stock_images/himalayan_monastery__eabed9cc.
 import boardGamesImage1 from "@assets/stock_images/people_board_games_c_23537000.jpg";
 import boardGamesImage2 from "@assets/stock_images/people_board_games_c_37ac7839.jpg";
 // Cycling/biking
-import cyclingImage1 from "@assets/stock_images/people_cycling_bikin_99294cb5.jpg";
 import cyclingImage2 from "@assets/stock_images/people_cycling_bikin_33c05549.jpg";
+import cyclingImage1 from "@assets/stock_images/people_cycling_bikin_99294cb5.jpg";
 // Art workshops
-import artImage1 from "@assets/stock_images/art_workshop_paintin_61252cb8.jpg";
-import artImage2 from "@assets/stock_images/art_workshop_paintin_d53280fd.jpg";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { EventCard } from "@/components/event-card";
-import { CategoryPill } from "@/components/category-pill";
-import { StarRating } from "@/components/star-rating";
 import {
   AnimatedStat,
   AnimatedStatsContainer,
 } from "@/components/animated-stat";
-import { type Event } from "@shared/schema";
+import { CategoryPill } from "@/components/category-pill";
+import { EventCard } from "@/components/event-card";
+import { StarRating } from "@/components/star-rating";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import useGetEvents from "@/hooks/events/use-get-events";
+import artImage1 from "@assets/stock_images/art_workshop_paintin_61252cb8.jpg";
+import artImage2 from "@assets/stock_images/art_workshop_paintin_d53280fd.jpg";
 import { categories } from "@shared/utils/constants";
-import { useQuery } from "@tanstack/react-query";
 
 export default function LandingPage() {
-  const { data: featuredEvents = [], isLoading } = useQuery<Event[]>({
-    queryKey: ["/api/events"],
+  const { data: featuredEvents, isLoading } = useGetEvents({
+    limit: 6,
+    offset: 0,
   });
 
   const galleryImages = [
@@ -349,7 +349,7 @@ export default function LandingPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredEvents.slice(0, 6).map((event, index) => (
+              {featuredEvents?.data?.map((event, index) => (
                 <EventCard
                   key={event.id}
                   event={event}
