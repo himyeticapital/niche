@@ -111,7 +111,6 @@ export const getEvents = async (req: Request, res: Response) => {
       toDate: req.query.toDate as string | undefined,
       startTime: req.query.startTime as string | undefined,
     };
-    console.log("🚀 ~ getEvents ~ filters:", filters.category);
 
     const whereClause = buildEventsWhereClause(filters);
     const orderByClause =
@@ -222,7 +221,7 @@ export const getEventsByPreference = async (req: Request, res: Response) => {
       )
     `,
       )
-      .limit(50);
+      .limit(10);
 
     return res.status(200).json({
       success: true,

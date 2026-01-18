@@ -36,7 +36,7 @@ export function EventCard({
 
   if (variant === "list") {
     return (
-      <Link href={`/events/${event.id}`}>
+      <Link href={`/events/${event.id}`} className={"block"}>
         <Card
           className="overflow-visible hover-elevate transition-transform cursor-pointer"
           data-testid={`event-card-${event.id}`}
@@ -119,6 +119,9 @@ export function EventCard({
             )}
           </div>
           <CardContent className="p-3 space-y-1">
+            <h3 className="font-semibold text-sm line-clamp-2 leading-tight mb-1">
+              {event.title}
+            </h3>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3 flex-shrink-0" />
               <span className="line-clamp-1">{event.locationName}</span>
@@ -138,7 +141,7 @@ export function EventCard({
       <Card
         className={cn(
           "overflow-visible hover-elevate transition-transform cursor-pointer group",
-          variant === "featured" && "md:col-span-2"
+          variant === "featured" && "md:col-span-2",
         )}
         data-testid={`event-card-${event.id}`}
       >
@@ -252,8 +255,8 @@ export function EventCard({
             {isFull
               ? "Event Full"
               : spotsLeft <= 5
-              ? `Join (${spotsLeft} spots left)`
-              : "Join Event"}
+                ? `Join (${spotsLeft} spots left)`
+                : "Join Event"}
           </Button>
         </CardContent>
       </Card>

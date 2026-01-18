@@ -1,35 +1,7 @@
+import { CategoryPill } from "@/components/category-pill";
 import { EventCard } from "@/components/event-card";
-import { useState } from "react";
-import {
-  Search,
-  MapPin,
-  SlidersHorizontal,
-  Grid3X3,
-  List,
-  Map,
-  X,
-  Loader2,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { CategoryPill } from "@/components/category-pill";
-import { categories } from "@shared/utils/constants";
 import {
   Pagination,
   PaginationContent,
@@ -37,17 +9,39 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import useEventsByPreference, {
   EventsByPreferenceResponse,
 } from "@/hooks/events/use-events-by-preference";
 import useGetEvents from "@/hooks/events/use-get-events";
 import { type Event } from "@shared/schema";
-import { useEffect } from "react";
+import { categories } from "@shared/utils/constants";
+import {
+  Grid3X3,
+  Info,
+  List,
+  Loader2,
+  Map,
+  MapPin,
+  Search,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { EventFiltersSheet } from "./components/EventFiltersSheet";
 import { EventFiltersWrapper } from "./components/EventFiltersWrapper";
 import { EventSkeletonGrid } from "./components/EventSkeletonGrid";
-import { EventFiltersSheet } from "./components/EventFiltersSheet";
 const initialFilterState = {
   searchQuery: "",
   category: "",
@@ -343,7 +337,7 @@ const FilteredEvents = ({
     <div>
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight text-white">
-          Recommended Events
+          All Events
         </h2>
         <Pagination className="flex justify-center" unstyled>
           <PaginationContent>
@@ -401,9 +395,28 @@ const RecommendedEvents = ({
 }) => {
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4 tracking-tight text-white">
-        Recommended Events
-      </h2>
+      <div className="flex items-center gap-1 mb-4">
+        <h2 className="text-2xl font-bold tracking-tight text-white">
+          Recommended Events
+        </h2>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant={"ghost"}
+              size={"icon"}
+              className="rounded-full "
+              aria-label="Info about recommended events"
+            >
+              <Info className="h-1 w-1" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="max-w-xs text-sm" align="start">
+            Recommended based on your preferences. Update them anytime from your
+            profile for better results.
+          </PopoverContent>
+        </Popover>
+      </div>
       <div
         className={
           viewMode === "list"
