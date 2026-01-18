@@ -96,7 +96,7 @@ export const getEvents = async (req: Request, res: Response) => {
       offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
       sortBy: req.query.sortBy as string | undefined,
       category: req.query.category as string | undefined,
-      searchQuery: req.query.q as string | undefined,
+      searchQuery: req.query.searchQuery as string | undefined,
       organizerRating: req.query.organizerRating
         ? parseFloat(req.query.organizerRating as string)
         : undefined,
