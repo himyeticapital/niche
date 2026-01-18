@@ -42,6 +42,7 @@ import { useLocation } from "wouter";
 import { EventFiltersSheet } from "./components/EventFiltersSheet";
 import { EventFiltersWrapper } from "./components/EventFiltersWrapper";
 import { EventSkeletonGrid } from "./components/EventSkeletonGrid";
+import { useDebounce } from "@/hooks/common/useDebounce";
 const initialFilterState = {
   searchQuery: "",
   category: "",
@@ -114,11 +115,14 @@ export default function EventsPage() {
     }
   }, []);
 
+  const debouncedSearchQuery = useDebounce<string>(filters.searchQuery, 300);
+  const debouncedPriceRange = useDebounce<number[]>(filters.priceRange, 300);
+  const debouncedMaxDistance = useDebounce<number[]>(filters.maxDistance, 300);
   const { data: eventsData, isLoading } = useGetEvents({
-    searchQuery: filters.searchQuery,
+    searchQuery: debouncedSearchQuery,
     category: filters.category,
-    maxDistance: filters.maxDistance,
-    priceRange: filters.priceRange,
+    maxDistance: debouncedMaxDistance,
+    priceRange: debouncedPriceRange,
     sortBy: filters.sortBy,
     organizerRating: filters.organizerRating,
     ageRequirement:
