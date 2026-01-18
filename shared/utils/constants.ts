@@ -20,3 +20,9 @@ export const categories = [
   { id: "gaming", name: "Gaming", icon: "gamepad-2" },
   { id: "art", name: "Art & Creative", icon: "palette" },
 ] as const;
+export const AGE_OPTIONS = [
+  { label: "All", value: 0 },
+  { label: "13+", value: 13 },
+  { label: "18+", value: 18 },
+  { label: "21+", value: 21 },
+];

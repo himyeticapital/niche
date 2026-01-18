@@ -1,6 +1,6 @@
 import { userPreferences } from "@shared/models";
 import { events } from "@shared/schema";
-import { SQL, sql, and, desc, eq, gte, lte, between } from "drizzle-orm";
+import { SQL, sql, and, desc, eq, gte, lte, between, asc } from "drizzle-orm";
 import { PgColumn, PgSelect } from "drizzle-orm/pg-core";
 import type { Request, Response } from "express";
 import { db } from "server/db";
@@ -9,7 +9,7 @@ function withPagination<T extends PgSelect>(
   qb: T,
   orderByColumn: PgColumn | SQL | SQL.Aliased,
   limit = 1,
-  offset = 3
+  offset = 3,
 ) {
   return qb.orderBy(orderByColumn).limit(limit).offset(offset);
 }
@@ -64,6 +64,14 @@ function buildEventsWhereClause(filters: {
   return conditions.length ? and(...conditions) : undefined;
 }
 
+const orderByMap = {
+  date: desc(events.date),
+  distance: desc(events.location), // Placeholder, actual distance calculation needed
+  "price-low": asc(events.price),
+  "price-high": desc(events.price),
+  rating: desc(events.rating),
+};
+
 /**
  * Fetch events with optional filters and pagination.
  *
@@ -86,6 +94,7 @@ export const getEvents = async (req: Request, res: Response) => {
     const filters = {
       limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
       offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
+      sortBy: req.query.sortBy as string | undefined,
       category: req.query.category as string | undefined,
       searchQuery: req.query.q as string | undefined,
       organizerRating: req.query.organizerRating
@@ -102,8 +111,13 @@ export const getEvents = async (req: Request, res: Response) => {
       toDate: req.query.toDate as string | undefined,
       startTime: req.query.startTime as string | undefined,
     };
+    console.log("🚀 ~ getEvents ~ filters:", filters.category);
 
     const whereClause = buildEventsWhereClause(filters);
+    const orderByClause =
+      filters.sortBy && orderByMap[filters.sortBy as keyof typeof orderByMap]
+        ? orderByMap[filters.sortBy as keyof typeof orderByMap]
+        : desc(events.date);
 
     // Count total rows with filters
     const totalRowsResult = await db
@@ -118,12 +132,16 @@ export const getEvents = async (req: Request, res: Response) => {
       const baseQuery = db.select().from(events).where(whereClause);
       allEvents = await withPagination(
         baseQuery.$dynamic(),
-        desc(events.date),
+        orderByClause,
         filters.limit,
-        filters.offset
+        filters.offset,
       );
     } else {
-      allEvents = await db.select().from(events).where(whereClause);
+      allEvents = await db
+        .select()
+        .from(events)
+        .where(whereClause)
+        .orderBy(orderByClause);
     }
 
     res.status(200).json({ success: true, data: allEvents, totalRows });
@@ -202,7 +220,7 @@ export const getEventsByPreference = async (req: Request, res: Response) => {
         ${events.location},
         ST_MakePoint(${pref.lng}, ${pref.lat})::geography
       )
-    `
+    `,
       )
       .limit(50);
 

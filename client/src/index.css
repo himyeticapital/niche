@@ -49,15 +49,15 @@
   --radius: 0.5rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 1px 2px -1px hsl(0 0% 0% / 0);
+  --shadow-sm:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
   --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 8px 10px -1px hsl(0 0% 0% / 0);
+  --shadow-md:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 2px 4px -1px hsl(0 0% 0% / 0);
+  --shadow-lg:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 4px 6px -1px hsl(0 0% 0% / 0);
+  --shadow-xl:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 8px 10px -1px hsl(0 0% 0% / 0);
   --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -79,8 +79,8 @@
   /* Fallback for older browsers */
   --primary-border: hsl(var(--primary));
   --primary-border: hsl(
-    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) /
-      alpha
+    from hsl(var(--primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
   );
 
   /* Fallback for older browsers */
@@ -100,8 +100,8 @@
   /* Fallback for older browsers */
   --accent-border: hsl(var(--accent));
   --accent-border: hsl(
-    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) /
-      alpha
+    from hsl(var(--accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
   );
 
   /* Fallback for older browsers */
@@ -154,15 +154,15 @@
   --chart-5: 27 87% 65%;
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 1px 2px -1px hsl(0 0% 0% / 0);
+  --shadow-sm:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
   --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0),
-    0px 8px 10px -1px hsl(0 0% 0% / 0);
+  --shadow-md:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 2px 4px -1px hsl(0 0% 0% / 0);
+  --shadow-lg:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 4px 6px -1px hsl(0 0% 0% / 0);
+  --shadow-xl:
+    0px 2px 0px 0px hsl(0 0% 0% / 0), 0px 8px 10px -1px hsl(0 0% 0% / 0);
   --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0);
 
   /* Fallback for older browsers */
@@ -182,8 +182,8 @@
   /* Fallback for older browsers */
   --primary-border: hsl(var(--primary));
   --primary-border: hsl(
-    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) /
-      alpha
+    from hsl(var(--primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
   );
 
   /* Fallback for older browsers */
@@ -203,8 +203,8 @@
   /* Fallback for older browsers */
   --accent-border: hsl(var(--accent));
   --accent-border: hsl(
-    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) /
-      alpha
+    from hsl(var(--accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
   );
 
   /* Fallback for older browsers */
@@ -249,6 +249,35 @@
   /* Hide ugly search cancel button in Chrome until we can style it properly */
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
+  }
+  /* For WebKit browsers (Chrome, Safari, Edge) */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  /* For Firefox (limited support, but you can try) */
+  input[type="date"]::-moz-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  /* For browsers supporting accent-color (experimental, not universal) */
+  input[type="date"] {
+    accent-color: white;
+  }
+
+  /* For WebKit browsers (Chrome, Safari, Edge) - time picker icon */
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  /* For Firefox (limited support, but you can try) */
+  input[type="time"]::-moz-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  /* For browsers supporting accent-color (experimental, not universal) */
+  input[type="time"] {
+    accent-color: white;
   }
 
   /* Placeholder styling for contentEditable div */
