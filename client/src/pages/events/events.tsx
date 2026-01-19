@@ -37,12 +37,14 @@ import {
   MapPin,
   Search,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { EventFiltersSheet } from "./components/EventFiltersSheet";
 import { EventFiltersWrapper } from "./components/EventFiltersWrapper";
 import { EventSkeletonGrid } from "./components/EventSkeletonGrid";
 import { useDebounce } from "@/hooks/common/useDebounce";
+import EventsMapView from "./components/EventsMapView";
+import { MapMarker } from "@/types/map";
 const initialFilterState = {
   searchQuery: "",
   category: "",
@@ -136,6 +138,14 @@ export default function EventsPage() {
 
   const { data: recommendedEvents, isLoading: isLoadingRecommended } =
     useEventsByPreference();
+
+  const mapMarkers: MapMarker[] = useMemo(() => {
+    if (!eventsData) return [];
+    return eventsData.data.map((event) => ({
+      geocode: [event.latitude, event.longitude],
+      title: event.title,
+    }));
+  }, [eventsData]);
 
   function handleFilterChange(type: string, value: any) {
     setFilters((prev) => ({ ...prev, [type]: value }));
@@ -277,40 +287,36 @@ export default function EventsPage() {
       </EventFiltersWrapper>
 
       <div className="mx-auto max-w-7xl px-4 py-8">
-        {/* Recommended Events */}
-        {recommendedEvents && recommendedEvents.data.length > 0 && (
-          <RecommendedEvents
-            viewMode={viewMode}
-            recommendedEvents={recommendedEvents}
-          />
-        )}
-
         {/* Events Grid/List */}
         {isLoading ? (
           <EventSkeletonGrid viewMode={viewMode} count={6} />
         ) : eventsData?.data.length === 0 ? (
           <NoEvents clearFilters={clearFilters} />
         ) : viewMode === "map" ? (
-          <div className="relative h-[600px] bg-muted rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              {/* Map view coming soon icon */}
-              <p className="text-muted-foreground">Map view coming soon</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {eventsData?.data.length} events in this area
-              </p>
-            </div>
+          <div className="h-[600px] bg-muted rounded-lg flex items-center justify-center">
+            <EventsMapView markers={mapMarkers} />
           </div>
         ) : (
-          <FilteredEvents
-            viewMode={viewMode}
-            filteredEvents={eventsData?.data || []}
-            totalEventsCount={eventsData?.totalRows || 0}
-            isLoading={isLoading}
-            onNextPage={handleNextPage}
-            onPrevPage={handlePrevPage}
-            isPrevActive={isPrevActive}
-            isNextActive={isNextActive}
-          />
+          <>
+            {/* Recommended Events */}
+            {recommendedEvents && recommendedEvents.data.length > 0 && (
+              <RecommendedEvents
+                viewMode={viewMode}
+                recommendedEvents={recommendedEvents}
+              />
+            )}
+            {/* Filtered Events */}
+            <FilteredEvents
+              viewMode={viewMode}
+              filteredEvents={eventsData?.data || []}
+              totalEventsCount={eventsData?.totalRows || 0}
+              isLoading={isLoading}
+              onNextPage={handleNextPage}
+              onPrevPage={handlePrevPage}
+              isPrevActive={isPrevActive}
+              isNextActive={isNextActive}
+            />
+          </>
         )}
       </div>
     </div>
