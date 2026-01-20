@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "dev:nodemon": "cross-env NODE_ENV=development nodemon --exec tsx server/index.ts",
