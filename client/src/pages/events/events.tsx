@@ -141,7 +141,7 @@ export default function EventsPage() {
 
   const mapMarkers: MapMarker[] = useMemo(() => {
     if (!eventsData) return [];
-    return eventsData.data.map((event) => ({
+    return eventsData.data.map((event: Event) => ({
       geocode: [event.latitude, event.longitude],
       title: event.title,
     }));
