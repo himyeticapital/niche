@@ -146,7 +146,7 @@ export const getEvents = async (req: Request, res: Response) => {
     res.status(200).json({ success: true, data: allEvents, totalRows });
   } catch (error) {
     console.error("Error fetching events:", error);
-    res.status(500).json({ error: "Failed to fetch events" });
+    res.status(500).json({ message: "Failed to fetch events", error: error });
   }
 };
 
