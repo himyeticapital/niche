@@ -13,13 +13,15 @@ import type { Event } from "@shared/schema";
 interface EventCardProps {
   event: Event;
   distance?: number;
-  variant?: "default" | "featured" | "list" | "compact";
+  variant?: "default" | "featured" | "list" | "compact" | "full";
+  rounded?: string; // Tailwind rounded class, e.g. 'rounded-lg'
 }
 
 export function EventCard({
   event,
   distance,
   variant = "default",
+  rounded,
 }: EventCardProps) {
   const CategoryIcon = getCategoryIcon(event.category);
   const isFull = event.currentAttendees! >= event.maxCapacity;
@@ -130,6 +132,135 @@ export function EventCard({
               <Calendar className="h-3 w-3" />
               {formatDate(event.date)} at {event.time}
             </span>
+          </CardContent>
+        </Card>
+      </Link>
+    );
+  }
+
+  if (variant === "full") {
+    // Use the passed rounded class or fallback to no rounding
+    const roundedClass = rounded || "rounded-none";
+    return (
+      <Link href={`/events/${event.id}`}>
+        <Card
+          className={cn(
+            "overflow-visible hover-elevate transition-transform cursor-pointer group h-full w-full flex flex-col",
+            roundedClass,
+          )}
+          data-testid={`event-card-full-${event.id}`}
+        >
+          <div
+            className={cn(
+              "relative aspect-video overflow-hidden bg-muted",
+              roundedClass,
+            )}
+            style={{ minHeight: 200 }}
+          >
+            {event.coverImage ? (
+              <img
+                src={event.coverImage}
+                alt={event.title}
+                className={cn(
+                  "h-full w-full object-cover transition-transform group-hover:scale-[1.02]",
+                  roundedClass,
+                )}
+              />
+            ) : (
+              <div
+                className={cn(
+                  "flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5",
+                  roundedClass,
+                )}
+              >
+                <CategoryIcon className="h-16 w-16 text-primary/40" />
+              </div>
+            )}
+            <div className="absolute top-3 left-3">
+              <Badge
+                variant="secondary"
+                className="bg-background/80 backdrop-blur-sm"
+              >
+                <CategoryIcon className="h-3 w-3 mr-1" />
+                {event.category}
+              </Badge>
+            </div>
+            {event.isFeatured && (
+              <div className="absolute bottom-3 left-3">
+                <Badge className="bg-amber-500 text-white">Trending</Badge>
+              </div>
+            )}
+          </div>
+          <CardContent className="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 className="font-semibold text-2xl line-clamp-2 leading-tight">
+                {event.title}
+              </h3>
+              <p className="text-base text-muted-foreground mt-2 flex items-center gap-1">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span className="line-clamp-1">{event.locationName}</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-3 mt-4">
+              <Avatar className="h-9 w-9">
+                {event.organizerAvatar ? (
+                  <AvatarImage
+                    src={event.organizerAvatar}
+                    alt={event.organizerName}
+                  />
+                ) : null}
+                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  {event.organizerName.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-base font-medium">
+                {event.organizerName}
+              </span>
+              {event.organizerVerified && <VerifiedBadge className="h-4 w-4" />}
+            </div>
+            <div className="flex items-center gap-4 text-base text-muted-foreground mt-4">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                {formatDate(event.date)} at {event.time}
+              </span>
+            </div>
+            <div className="flex items-center justify-between pt-4 border-t mt-4">
+              <div className="flex items-center gap-3">
+                <span className="font-semibold">
+                  {event.price === 0 ? (
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      Free
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <IndianRupee className="h-4 w-4" />
+                      {event.price}
+                    </span>
+                  )}
+                </span>
+                <span className="text-base text-muted-foreground flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  {event.currentAttendees}/{event.maxCapacity}
+                </span>
+              </div>
+              <StarRating
+                rating={event.rating || 0}
+                reviewCount={event.reviewCount || 0}
+                size="md"
+              />
+            </div>
+            <Button
+              className="w-full mt-6"
+              variant={isFull ? "secondary" : "default"}
+              disabled={isFull}
+              data-testid={`button-join-${event.id}`}
+            >
+              {isFull
+                ? "Event Full"
+                : spotsLeft <= 5
+                  ? `Join (${spotsLeft} spots left)`
+                  : "Join Event"}
+            </Button>
           </CardContent>
         </Card>
       </Link>

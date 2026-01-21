@@ -77,6 +77,7 @@ export default function EventsPage() {
     lng: 88.6138,
   });
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -142,10 +143,15 @@ export default function EventsPage() {
   const mapMarkers: MapMarker[] = useMemo(() => {
     if (!eventsData) return [];
     return eventsData.data.map((event: Event) => ({
+      id: event.id,
       geocode: [event.latitude, event.longitude],
       title: event.title,
     }));
   }, [eventsData]);
+
+  function handleMarkerSelect(eventId: string) {
+    setSelectedEventId(eventId);
+  }
 
   function handleFilterChange(type: string, value: any) {
     setFilters((prev) => ({ ...prev, [type]: value }));
@@ -175,6 +181,13 @@ export default function EventsPage() {
       offset: prev.offset - prev.limit,
     }));
   }
+
+  const selectedEvent = useMemo(() => {
+    if (!selectedEventId || !eventsData) return null;
+    return (
+      eventsData.data.find((event) => event.id === selectedEventId) || null
+    );
+  }, [selectedEventId, eventsData]);
 
   const isNextActive =
     paginationState.offset + paginationState.limit >=
@@ -294,7 +307,18 @@ export default function EventsPage() {
           <NoEvents clearFilters={clearFilters} />
         ) : viewMode === "map" ? (
           <div className="h-[600px] bg-muted rounded-lg flex items-center justify-center">
-            <EventsMapView markers={mapMarkers} />
+            <EventsMapView markers={mapMarkers} onSelect={handleMarkerSelect} />
+            <div className="w-[500px] p-0 h-full rounded-lg ">
+              {selectedEvent ? (
+                <EventCard
+                  event={selectedEvent}
+                  variant="full"
+                  rounded="rounded-r-lg"
+                />
+              ) : (
+                <ClickMarkerPrompt />
+              )}
+            </div>
           </div>
         ) : (
           <>
@@ -395,6 +419,20 @@ const FilteredEvents = ({
     </div>
   );
 };
+
+// Place this above your EventsPage component or at the bottom of the file
+const ClickMarkerPrompt = () => (
+  <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
+    <MapPin className="w-10 h-10 mb-4 opacity-60" />
+    <h3 className="text-lg font-semibold mb-2">
+      Click a marker to view event details
+    </h3>
+    <p>
+      Select a location marker on the map to see more information about the
+      event.
+    </p>
+  </div>
+);
 
 const RecommendedEvents = ({
   viewMode,
